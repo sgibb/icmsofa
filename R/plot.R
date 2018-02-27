@@ -4,12 +4,20 @@
 #'
 #' @param x `data.frame`
 #' @param path `character`, file path
+#' @param timepoints `data.frame`, with timepoints
 #' @export
-plotSofa <- function(x, path) {
+plotSofa <- function(x, path, timepoints) {
     invisible(lapply(split(x, x$Id), function(sb) {
         .plotSofa(
             sb,
-            file=file.path(path, paste(sb$Id[1L], "png", sep="."))
+            file=file.path(path, paste(sb$Id[1L], "png", sep=".")),
+            timepoints=unlist(
+                timepoints[
+                    timepoints[,1L] == sb$Id[1L],
+                    seq_len(ncol(timepoints) - 1L) + 1L,
+                    drop=TRUE
+                ]
+            )
         )
     }))
 }
@@ -20,8 +28,9 @@ plotSofa <- function(x, path) {
 #'
 #' @param x `data.frame`, single patient
 #' @param file `character`, filename (if given plotted to png)
+#' @param timepoints `double`, named timepoints
 #' @noRd
-.plotSofa <- function(x, file=NULL) {
+.plotSofa <- function(x, file=NULL, timepoints=NULL) {
     if (!is.null(file)) {
         png(file, height=1440, width=(length(.hourly(x$Date)) / 2L + 12L) * 25L)
         on.exit(dev.off(), add=TRUE)
@@ -44,7 +53,7 @@ plotSofa <- function(x, path) {
         side=c(2L, 2L, 2L, 4L),
         stringsAsFactors=FALSE
     )
-    .plotSubScores(x, d)
+    .plotSubScores(x, d, timepoints)
 
     d <- data.frame(
         nms=c("IBP", "DOB", "NOR", "SOFA"),
@@ -57,7 +66,7 @@ plotSofa <- function(x, path) {
         side=c(2L, 2L, 2L, 4L),
         stringsAsFactors=FALSE
     )
-    .plotSubScores(x, d)
+    .plotSubScores(x, d, timepoints)
 
     d <- data.frame(
         nms=c("BIL", "SOFA"),
@@ -69,7 +78,7 @@ plotSofa <- function(x, path) {
         side=c(2L, 4L),
         stringsAsFactors=FALSE
     )
-    .plotSubScores(x, d)
+    .plotSubScores(x, d, timepoints)
 
     d <- data.frame(
         nms=c("PLT", "SOFA"),
@@ -81,7 +90,7 @@ plotSofa <- function(x, path) {
         side=c(2L, 4L),
         stringsAsFactors=FALSE
     )
-    .plotSubScores(x, d)
+    .plotSubScores(x, d, timepoints)
 
     d <- data.frame(
         nms=c("CRE", "SOFA"),
@@ -93,19 +102,20 @@ plotSofa <- function(x, path) {
         side=c(2L, 4L),
         stringsAsFactors=FALSE
     )
-    .plotSubScores(x, d)
+    .plotSubScores(x, d, timepoints)
 
     par(mar=c(7L, 9L, 0L, 3L))
-    .plotSofaScores(x)
+    .plotSofaScores(x, timepoints)
 }
 
 #' Plot SOFA SubScores
 #'
 #' @param x `data.frame`
 #' @param d `data.frame`, with names, position, colors etc.
+#' @param timepoints `double`, named timepoints
 #' @param at `POSIXct`, hourly sequence
 #' @noRd
-.plotSubScores <- function(x, d, at=.hourly(x$Date)) {
+.plotSubScores <- function(x, d, timepoints=NULL, at=.hourly(x$Date)) {
     y <- seq(0, 1, by=0.2)
     iSofa <- nrow(d)
 
@@ -115,6 +125,14 @@ plotSofa <- function(x, path) {
     even <- as.numeric(at) %% 7200L == 0L
     abline(v=at[even], col="#808080", lwd=0.5, lty=3L)
     abline(h=0L, col="#808080", lwd=0.5, lty=1L)
+
+    if (!is.null(timepoints)) {
+        abline(v=timepoints, col="#FF7F00")
+        text(
+            x=timepoints, y=0L, labels=names(timepoints), srt=90, adj=c(0L, 1.1),
+            col="#FF7F00", cex=1.2
+        )
+    }
 
     for (i in seq_len(nrow(d) - 1L)) {
         points(
@@ -164,13 +182,23 @@ plotSofa <- function(x, path) {
 #' Plot SOFA Scores
 #'
 #' @param x `data.frame`
+#' @param timepoints `double`, named timepoints
 #' @param at `POSIXct`, hourly sequence
 #' @noRd
-.plotSofaScores <- function(x, at=.hourly(x$Date)) {
+.plotSofaScores <- function(x, timepoints=NULL, at=.hourly(x$Date)) {
     plot(NA, xlim=range(at), ylim=c(0L, 24L), type="n",
          axes=FALSE, ann=FALSE, frame.plot=FALSE)
     even <- as.numeric(at) %% 7200L == 0L
     abline(v=at[even], col="#808080", lwd=0.5, lty=3L)
+
+    if (!is.null(timepoints)) {
+        abline(v=timepoints, col="#FF7F00")
+        text(
+            x=timepoints, y=0L, labels=names(timepoints), srt=90, adj=c(0L, 1.1),
+            col="#FF7F00", cex=1.2
+        )
+    }
+
     axis(side=1L, at=at[even], labels=FALSE)
     text(
         x=at[even], y=par("usr")[3L], labels=format(at[even], "%Y-%m-%d %H:%M"),
