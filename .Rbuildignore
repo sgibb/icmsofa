@@ -1,0 +1,11 @@
+^LICENSE$
+^CONTRIBUTING\.md$
+^README\.md$
+^SUPPORT\.md$
+^\.git$
+^\.gitignore$
+^\.lintr$
+^\.travis.yml$
+^playground$
+^notes$
+^docs$
