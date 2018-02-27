@@ -34,3 +34,20 @@ importIcm <- function(file, sheets=c(PAO="PO2",
 
     tbl[order(tbl$Id, tbl$Date),]
 }
+
+#' Import timepoint data.
+#'
+#' Import timepoint data.
+#'
+#' @param file `character`, filename
+#' @return data.frame
+#' @export
+importTimepoints <- function(file) {
+    tbl <- read_excel(file)
+    tbl[-1L] <- lapply(
+        tbl[-1L],
+        as.POSIXct,
+        format="%d.%m.%Y %H:%M", origin="1970-01-01 00:00:00", tz="UTC"
+    )
+    as.data.frame(tbl, stringsAsFactors=FALSE)
+}

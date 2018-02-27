@@ -7,7 +7,7 @@
 #' @export
 addSofa <- function(x) {
     x <- .addSubScores(x)
-    x <- .addSubScores(x)
+    x <- .addSofaScores(x)
     x
 }
 
