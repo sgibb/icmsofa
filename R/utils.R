@@ -9,6 +9,29 @@
     c(NA, x[!na])[idx]
 }
 
+#' Hourly dates
+#'
+#' seq dates
+#'
+#' @param x `POSIXct`
+#' @return `POSIXct`
+#' @noRd
+.hourly <- function(x) {
+    r <- .limDates(x)
+    seq(r[1L], r[2L], by=3600L)
+}
+
+#' limits dates
+#'
+#' Date limits, rounded to the previous/next hour
+#'
+#' @param x `POSIXct`
+#' @return `POSIXct`
+#' @noRd
+.limDates <- function(x) {
+    trunc(range(x), "hour") + c(0L, 3600L)
+}
+
 #' Calculate maximum
 #'
 #' Calculate `max` and ignore `NA`, except everything is `NA`

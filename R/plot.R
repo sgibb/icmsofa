@@ -1,0 +1,193 @@
+#' Plot SOFA scores
+#'
+#' Plotting scores
+#'
+#' @param x `data.frame`
+#' @param path `character`, file path
+#' @export
+plotSofa <- function(x, path) {
+    invisible(lapply(split(x, x$Id), function(sb) {
+        .plotSofa(
+            sb,
+            file=file.path(path, paste(sb$Id[1L], "png", sep="."))
+        )
+    }))
+}
+
+#' Plot SOFA and SubScores
+#'
+#' Internal function
+#'
+#' @param x `data.frame`, single patient
+#' @param file `character`, filename (if given plotted to png)
+#' @noRd
+.plotSofa <- function(x, file=NULL) {
+    if (!is.null(file)) {
+        png(file, height=1440, width=(length(.hourly(x$Date)) / 2L + 12L) * 25L)
+        on.exit(dev.off(), add=TRUE)
+    } else {
+        old <- par(no.readonly=TRUE)
+        on.exit(par(old))
+    }
+    par(mar=c(0L, 9L, 0L, 3L))
+
+    layout(matrix(1L:6L), heights=c(2L, 2L, 1L, 1L, 1L, 1L))
+           #heights=c(rep(2L, 5L), 3L))
+
+    d <- data.frame(
+        nms=c("FIO", "PAO", "HOR", "SOFA"),
+        lnms=c("FiO2", "PaO2 [mmHg]", "Horovitz [mmHg]", "SOFA Subscore"),
+        col=c("#A6CEE3", "#1F78B4", "#B2DF8A", "#B15928"),
+        pch=c(20, 20, 17, 15),
+        scl=c(1L, 500L, 500L, 4L),
+        line=c(0L, 3L, 6L, 0L),
+        side=c(2L, 2L, 2L, 4L),
+        stringsAsFactors=FALSE
+    )
+    .plotSubScores(x, d)
+
+    d <- data.frame(
+        nms=c("IBP", "DOB", "NOR", "SOFA"),
+        lnms=c("Mean (Non)-Invasive Blood Pressure [mmHg]", "Dobutamine [ml/h]",
+               "Norepinephrine [µg/kg/min]", "SOFA Subscore"),
+        col=c("#E31A1C", "#6A3D9A", "#CAB2D6", "#B15928"),
+        pch=c(20, 20, 20, 15),
+        scl=c(150L, 10L, 1L, 4L),
+        line=c(0L, 3L, 6L, 0L),
+        side=c(2L, 2L, 2L, 4L),
+        stringsAsFactors=FALSE
+    )
+    .plotSubScores(x, d)
+
+    d <- data.frame(
+        nms=c("BIL", "SOFA"),
+        lnms=c("Bilirubin [µmol/l]", "SOFA Subscore"),
+        col=c("#33A02C", "#B15928"),
+        pch=c(20, 15),
+        scl=c(200L, 4L),
+        line=c(0L, 0L),
+        side=c(2L, 4L),
+        stringsAsFactors=FALSE
+    )
+    .plotSubScores(x, d)
+
+    d <- data.frame(
+        nms=c("PLT", "SOFA"),
+        lnms=c("Platelets [Gpt/l]", "SOFA Subscore"),
+        col=c("#FB9A99", "#B15928"),
+        pch=c(20, 15),
+        scl=c(150L, 4L),
+        line=c(0L, 0L),
+        side=c(2L, 4L),
+        stringsAsFactors=FALSE
+    )
+    .plotSubScores(x, d)
+
+    d <- data.frame(
+        nms=c("CRE", "SOFA"),
+        lnms=c("Creatinine [µmol/l]", "SOFA Subscore"),
+        col=c("#FDBF6F", "#B15928"),
+        pch=c(20, 15),
+        scl=c(450L, 4L),
+        line=c(0L, 0L),
+        side=c(2L, 4L),
+        stringsAsFactors=FALSE
+    )
+    .plotSubScores(x, d)
+
+    par(mar=c(7L, 9L, 0L, 3L))
+    .plotSofaScores(x)
+}
+
+#' Plot SOFA SubScores
+#'
+#' @param x `data.frame`
+#' @param d `data.frame`, with names, position, colors etc.
+#' @param at `POSIXct`, hourly sequence
+#' @noRd
+.plotSubScores <- function(x, d, at=.hourly(x$Date)) {
+    y <- seq(0, 1, by=0.2)
+    iSofa <- nrow(d)
+
+    plot(NA, xlim=range(at), ylim=c(0L, 1L), type="n",
+         axes=FALSE, ann=FALSE, frame.plot=FALSE)
+
+    even <- as.numeric(at) %% 7200L == 0L
+    abline(v=at[even], col="#808080", lwd=0.5, lty=3L)
+    abline(h=0L, col="#808080", lwd=0.5, lty=1L)
+
+    for (i in seq_len(nrow(d) - 1L)) {
+        points(
+            x$Date[x$Type == d$nms[i]],
+            x$Value[x$Type == d$nms[i]] / d$scl[i],
+            col=d$col[i], pch=d$pch[i], type="b"
+        )
+
+        points(
+            x$Date[x$Type == d$nms[i]],
+            x$SubScore[x$Type == d$nms[i]] / d$scl[iSofa],
+            col=d$col[iSofa], type="s", lwd=1.2
+        )
+
+        points(
+            x$Date[x$Type == d$nms[i]],
+            x$SubScore[x$Type == d$nms[i]] / d$scl[iSofa],
+            col=d$col[iSofa], type="p", pch=d$pch[iSofa], cex=1.2
+        )
+
+        axis(side=d$side[i], at=y, labels=FALSE, line=d$line[i], col=d$col[i])
+        mtext(
+            side=d$side[i], at=y, text=y * d$scl[i], line=d$line[i] + 0.5,
+            col=d$col[i]
+        )
+        mtext(
+            side=d$side[i], line=d$line[i] + 1.5, text=d$lnms[i], col=d$col[i]
+        )
+    }
+    axis(
+        side=d$side[iSofa], at=seq(0, 1, by=0.25), labels=FALSE,
+        line=d$line[iSofa]
+    )
+    mtext(
+        side=d$side[iSofa], at=seq(0, 1, by=0.25), text=0L:4L, col=d$col[iSofa],
+        line=d$line[iSofa] + 1L
+    )
+    mtext(
+        side=d$side[iSofa], line=d$line[iSofa] + 2L, text=d$lnms[iSofa],
+        col=d$col
+    )
+    legend(
+        "bottomright", legend=d$lnms, col=d$col, pch=d$pch, lwd=1L, bty="n"
+    )
+}
+
+#' Plot SOFA Scores
+#'
+#' @param x `data.frame`
+#' @param at `POSIXct`, hourly sequence
+#' @noRd
+.plotSofaScores <- function(x, at=.hourly(x$Date)) {
+    plot(NA, xlim=range(at), ylim=c(0L, 24L), type="n",
+         axes=FALSE, ann=FALSE, frame.plot=FALSE)
+    even <- as.numeric(at) %% 7200L == 0L
+    abline(v=at[even], col="#808080", lwd=0.5, lty=3L)
+    axis(side=1L, at=at[even], labels=FALSE)
+    text(
+        x=at[even], y=par("usr")[3L], labels=format(at[even], "%Y-%m-%d %H:%M"),
+        srt=60, adj=c(1.1, 0.5), xpd=TRUE
+    )
+
+    points(x$Date, x$Sofa, type="s", lwd=1.2, col="#B15928")
+    points(x$Date, x$Sofa, type="p", pch=20L, cex=1.2, col="#B15928")
+    y <- seq(0L, 24L, by=4L)
+    axis(side=2L, at=y, labels=FALSE, line=0L, col="#B15928")
+    axis(side=4L, at=y, labels=FALSE, line=0L, col="#B15928")
+    mtext(side=2L, at=y, text=y, col="#B15928", line=1L)
+    mtext(side=4L, at=y, text=y, col="#B15928", line=1L)
+    mtext(side=2L, text="SOFA Score", col="#B15928", line=2L)
+    mtext(side=4L, text="SOFA Score", col="#B15928", line=2L)
+    legend(
+        "bottomright", legend="SOFA Score", col="#B15928", pch=20L, lwd=1L,
+        bty="n"
+    )
+}
