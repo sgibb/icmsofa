@@ -1,5 +1,13 @@
 context("utils")
 
+test_that(".daily", {
+    expect_equal(sofa:::.daily(as.POSIXct(
+        c("2014-02-26 22:50:10 UTC", "2014-02-27 00:02:00 UTC",
+          "2014-02-27 00:02:00 UTC"))),
+        as.POSIXct(c("2014-02-26 00:00:00 UTC", "2014-02-27 00:00:00 UTC",
+                     "2014-02-28 00:00:00 UTC")))
+})
+
 test_that(".fillNa", {
     expect_equal(sofa:::.fillNa(1:10), 1:10)
     expect_equal(sofa:::.fillNa(c(NA, 1, NA, NA, 2, NA, 1, NA, 3)),
@@ -14,13 +22,6 @@ test_that(".hourly", {
           "2014-02-27 00:02:00 UTC"))),
         as.POSIXct(c("2014-02-26 22:00:00 UTC", "2014-02-26 23:00:00 UTC",
                      "2014-02-27 00:00:00 UTC", "2014-02-27 01:00:00 UTC")))
-})
-
-test_that(".limDates", {
-    expect_equal(sofa:::.limDates(as.POSIXct(
-        c("2014-02-26 22:50:10 UTC", "2014-02-27 19:00:00 UTC",
-          "2014-03-02 11:32:00 UTC"))),
-        as.POSIXct(c("2014-02-26 22:00:00 UTC", "2014-03-02 12:00:00 UTC")))
 })
 
 test_that(".maxNa", {

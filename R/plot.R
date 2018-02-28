@@ -32,16 +32,15 @@ plotSofa <- function(x, path, timepoints) {
 #' @noRd
 .plotSofa <- function(x, file=NULL, timepoints=NULL) {
     if (!is.null(file)) {
-        png(file, height=1440, width=(length(.hourly(x$Date)) / 2L + 12L) * 25L)
+        png(file, height=1440, width=(length(.hourly(x$Date)) / 2L + 12L) * 50L, pointsize=18)
         on.exit(dev.off(), add=TRUE)
     } else {
         old <- par(no.readonly=TRUE)
         on.exit(par(old))
     }
-    par(mar=c(0L, 9L, 0L, 3L))
-
     layout(matrix(1L:6L), heights=c(2L, 2L, 1L, 1L, 1L, 1L))
            #heights=c(rep(2L, 5L), 3L))
+    par(mar=c(0L, 9L, 0L, 3L))
 
     d <- data.frame(
         nms=c("FIO", "PAO", "HOR", "SOFA"),
@@ -113,18 +112,21 @@ plotSofa <- function(x, path, timepoints) {
 #' @param x `data.frame`
 #' @param d `data.frame`, with names, position, colors etc.
 #' @param timepoints `double`, named timepoints
-#' @param at `POSIXct`, hourly sequence
 #' @noRd
-.plotSubScores <- function(x, d, timepoints=NULL, at=.hourly(x$Date)) {
+.plotSubScores <- function(x, d, timepoints=NULL) {
     y <- seq(0, 1, by=0.2)
     iSofa <- nrow(d)
+
+    at <- .hourly(x$Date)
+    days <- .daily(x$Date)
+    even <- as.numeric(at) %% 7200L == 0L
 
     plot(NA, xlim=range(at), ylim=c(0L, 1L), type="n",
          axes=FALSE, ann=FALSE, frame.plot=FALSE)
 
-    even <- as.numeric(at) %% 7200L == 0L
     abline(v=at[even], col="#808080", lwd=0.5, lty=3L)
     abline(h=0L, col="#808080", lwd=0.5, lty=1L)
+    abline(v=days, col="#808080", lwd=0.5)
 
     if (!is.null(timepoints)) {
         abline(v=timepoints, col="#FF7F00")
@@ -156,10 +158,11 @@ plotSofa <- function(x, path, timepoints) {
         axis(side=d$side[i], at=y, labels=FALSE, line=d$line[i], col=d$col[i])
         mtext(
             side=d$side[i], at=y, text=y * d$scl[i], line=d$line[i] + 0.5,
-            col=d$col[i]
+            col=d$col[i], cex=0.8
         )
         mtext(
-            side=d$side[i], line=d$line[i] + 1.5, text=d$lnms[i], col=d$col[i]
+            side=d$side[i], line=d$line[i] + 1.5, text=d$lnms[i], col=d$col[i],
+            cex=0.8
         )
     }
     axis(
@@ -168,11 +171,11 @@ plotSofa <- function(x, path, timepoints) {
     )
     mtext(
         side=d$side[iSofa], at=seq(0, 1, by=0.25), text=0L:4L, col=d$col[iSofa],
-        line=d$line[iSofa] + 1L
+        line=d$line[iSofa] + 1L, cex=0.8
     )
     mtext(
         side=d$side[iSofa], line=d$line[iSofa] + 2L, text=d$lnms[iSofa],
-        col=d$col
+        col=d$col, cex=0.8
     )
     legend(
         "bottomright", legend=d$lnms, col=d$col, pch=d$pch, lwd=1L, bty="n"
@@ -185,11 +188,21 @@ plotSofa <- function(x, path, timepoints) {
 #' @param timepoints `double`, named timepoints
 #' @param at `POSIXct`, hourly sequence
 #' @noRd
-.plotSofaScores <- function(x, timepoints=NULL, at=.hourly(x$Date)) {
+.plotSofaScores <- function(x, timepoints=NULL) {
+    y <- seq(0L, 24L, by=2L)
+    y2 <- seq(0L, 24L, by=4L)
+    at <- .hourly(x$Date)
+    days <- .daily(x$Date)
+    even <- as.numeric(at) %% 7200L == 0L
+
     plot(NA, xlim=range(at), ylim=c(0L, 24L), type="n",
          axes=FALSE, ann=FALSE, frame.plot=FALSE)
-    even <- as.numeric(at) %% 7200L == 0L
+
     abline(v=at[even], col="#808080", lwd=0.5, lty=3L)
+    abline(h=0L, col="#808080", lwd=0.5, lty=1L)
+    abline(v=days, col="#808080", lwd=0.5)
+    text(x=rep(days, each=length(y2)), y=rep(y2, length(days)), labels=y2,
+         col="#808080", adj=c(0L, 0.5), cex=0.5)
 
     if (!is.null(timepoints)) {
         abline(v=timepoints, col="#FF7F00")
@@ -207,15 +220,15 @@ plotSofa <- function(x, path, timepoints) {
 
     points(x$Date, x$Sofa, type="s", lwd=1.2, col="#B15928")
     points(x$Date, x$Sofa, type="p", pch=20L, cex=1.2, col="#B15928")
-    y <- seq(0L, 24L, by=4L)
-    axis(side=2L, at=y, labels=FALSE, line=0L, col="#B15928")
-    axis(side=4L, at=y, labels=FALSE, line=0L, col="#B15928")
-    mtext(side=2L, at=y, text=y, col="#B15928", line=1L)
-    mtext(side=4L, at=y, text=y, col="#B15928", line=1L)
-    mtext(side=2L, text="SOFA Score", col="#B15928", line=2L)
-    mtext(side=4L, text="SOFA Score", col="#B15928", line=2L)
+    axis(side=2L, at=y2, labels=FALSE, line=0L, col="#B15928")
+    axis(side=4L, at=y2, labels=FALSE, line=0L, col="#B15928")
+    mtext(side=2L, at=y2, text=y2, col="#B15928", line=1L, cex=0.5)
+    mtext(side=4L, at=y2, text=y2, col="#B15928", line=1L, cex=0.5)
+    mtext(side=2L, text="SOFA Score", col="#B15928", line=2L, cex=0.5)
+    mtext(side=4L, text="SOFA Score", col="#B15928", line=2L, cex=0.5)
     legend(
         "bottomright", legend="SOFA Score", col="#B15928", pch=20L, lwd=1L,
         bty="n"
     )
+    title(sub=x$Id[1L], adj=1L, cex=2L)
 }

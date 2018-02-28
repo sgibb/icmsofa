@@ -1,3 +1,15 @@
+#' Daily dates
+#'
+#' daily dates, limits rounded to the previous/next day
+#'
+#' @param x `POSIXct`
+#' @return `POSIXct`
+#' @noRd
+.daily <- function(x) {
+    r <- trunc(range(x), "days") + c(0L, 86400L)
+    seq(r[1L], r[2L], by=86400L)
+}
+
 #' Replace NA with last vaild value
 #'
 #' @param x vector
@@ -11,25 +23,14 @@
 
 #' Hourly dates
 #'
-#' seq dates
+#' hourly dates, limits rounded to the previous/next hour
 #'
 #' @param x `POSIXct`
 #' @return `POSIXct`
 #' @noRd
 .hourly <- function(x) {
-    r <- .limDates(x)
+    r <- trunc(range(x), "hour") + c(0L, 3600L)
     seq(r[1L], r[2L], by=3600L)
-}
-
-#' limits dates
-#'
-#' Date limits, rounded to the previous/next hour
-#'
-#' @param x `POSIXct`
-#' @return `POSIXct`
-#' @noRd
-.limDates <- function(x) {
-    trunc(range(x), "hour") + c(0L, 3600L)
 }
 
 #' Calculate maximum
