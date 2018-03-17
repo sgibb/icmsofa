@@ -69,18 +69,20 @@ importIcm <- function(file,
 #'
 #' @noRd
 .import <- function(tbl, verbose=interactive()) {
-    tbl$Date <- as.POSIXct(tbl$Date, origin="1970-01-01 00:00:00", tz="UTC")
-
+    if (verbose) {
+        message("Inspect BGA values ...")
+    }
+    tbl <- .filterBga(tbl, keep="arterial", verbose=verbose)
+    if (verbose) {
+        message("Inspect paO2 values ...")
+    }
+    isPaO2 <- tbl$Type == "PAO2" & !is.na(tbl$Type)
+    tbl$Value[isPaO2] <- .filterPaO2(tbl$Value[isPaO2], verbose=verbose)
     if (verbose) {
         message("Inspect PaO2 values ...")
     }
-    tbl$Value[tbl$Type == "PAO2"] <-
-        .filterPaO2(tbl$Value[tbl$Type == "PAO2"], verbose=verbose)
-    if (verbose) {
-        message("Inspect PaO2 values ...")
-    }
-    tbl$Value[tbl$Type == "FIO2"] <-
-        .filterFiO2(tbl$Value[tbl$Type == "FIO2"], verbose=verbose)
+    isFiO2 <- tbl$Type == "FIO2" & !is.na(tbl$Type)
+    tbl$Value[isFiO2] <- .filterFiO2(tbl$Value[isFiO2], verbose=verbose)
     if (verbose) {
         message("Inspect (N)IBP values ...")
     }

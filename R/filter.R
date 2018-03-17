@@ -47,7 +47,7 @@
 .filterRange <- function(x, range, verbose=interactive()) {
     stopifnot(is.numeric(x))
     stopifnot(is.numeric(range) && length(range) == 2L)
-    isOOR <- x < range[1L] | x > range[2L]
+    isOOR <- x < range[1L] | x > range[2L] | is.na(x)
     if (verbose && any(isOOR)) {
         message(
             sum(isOOR), " values removed because they are ",
