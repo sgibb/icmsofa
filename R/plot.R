@@ -6,19 +6,23 @@
 #' @param path `character`, file path
 #' @param timepoints `data.frame`, with timepoints
 #' @export
-plotSofa <- function(x, path, timepoints) {
+plotSofa <- function(x, path, timepoints=NULL) {
     invisible(lapply(split(x, x$CaseId), function(sb) {
-        .plotSofa(
-            sb,
-            file=file.path(path, paste(sb$CaseId[1L], "png", sep=".")),
-            timepoints=unlist(
-                timepoints[
-                    timepoints[,1L] == sb$CaseId[1L],
-                    seq_len(ncol(timepoints) - 1L) + 1L,
-                    drop=TRUE
-                ]
+        file <- file.path(path, paste(sb$CaseId[1L], "png", sep="."))
+        if (!is.null(timepoints)) {
+            .plotSofa(
+                sb, file=file,
+                timepoints=unlist(
+                    timepoints[
+                        timepoints[,1L] == sb$CaseId[1L],
+                        seq_len(ncol(timepoints) - 1L) + 1L,
+                        drop=TRUE
+                    ]
+                )
             )
-        )
+        } else {
+            .plotSofa(sb, file=file)
+        }
     }))
 }
 
@@ -32,7 +36,12 @@ plotSofa <- function(x, path, timepoints) {
 #' @noRd
 .plotSofa <- function(x, file=NULL, timepoints=NULL) {
     if (!is.null(file)) {
-        png(file, height=1440, width=(length(.hourly(x$Date)) / 2L + 12L) * 50L, pointsize=18)
+        png(
+            file,
+            height=1440,
+            width=min((length(.hourly(x$Date)) / 2L + 12L) * 50L, 30000),
+            pointsize=18
+        )
         on.exit(dev.off(), add=TRUE)
     } else {
         old <- par(no.readonly=TRUE)
@@ -43,7 +52,7 @@ plotSofa <- function(x, path, timepoints) {
     par(mar=c(0L, 9L, 0L, 3L))
 
     d <- data.frame(
-        nms=c("FIO", "PAO", "HOR", "SOFA"),
+        nms=c("FIO2", "PAO2", "HORV", "SOFA"),
         lnms=c("FiO2", "PaO2 [mmHg]", "Horovitz [mmHg]", "SOFA Subscore"),
         col=c("#A6CEE3", "#1F78B4", "#B2DF8A", "#B15928"),
         pch=c(20, 20, 17, 15),
@@ -68,7 +77,7 @@ plotSofa <- function(x, path, timepoints) {
     .plotSubScores(x, d, timepoints)
 
     d <- data.frame(
-        nms=c("BIL", "SOFA"),
+        nms=c("BILI", "SOFA"),
         lnms=c("Bilirubin [\u00B5mol/l]", "SOFA Subscore"),
         col=c("#33A02C", "#B15928"),
         pch=c(20, 15),
@@ -92,7 +101,7 @@ plotSofa <- function(x, path, timepoints) {
     .plotSubScores(x, d, timepoints)
 
     d <- data.frame(
-        nms=c("CRE", "SOFA"),
+        nms=c("CREA", "SOFA"),
         lnms=c("Creatinine [\u00B5mol/l]", "SOFA Subscore"),
         col=c("#FDBF6F", "#B15928"),
         pch=c(20, 15),
