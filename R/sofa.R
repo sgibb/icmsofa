@@ -23,9 +23,13 @@ addSofa <- function(x, na.rm=FALSE) {
     x$SubScore <- NA_integer_
 
     ## easy scores
-    x$SubScore[x$Type == "BILI"] <- .bilirubin2sofa(x$Value[x$Type == "BILI"])
-    x$SubScore[x$Type == "PLT"] <- .platelets2sofa(x$Value[x$Type == "PLT"])
-    x$SubScore[x$Type == "CREA"] <- .creatinine2sofa(x$Value[x$Type == "CREA"])
+    typeNa <- is.na(x$Type)
+    isBili <- x$Type == "BILI" & !typeNa
+    isPlt <- x$Type == "PLT" & !typeNa
+    isCrea <- x$Type == "CREA" & !typeNa
+    x$SubScore[isBili] <- .bilirubin2sofa(x$Value[isBili])
+    x$SubScore[isPlt] <- .platelets2sofa(x$Value[isPlt])
+    x$SubScore[isCrea] <- .creatinine2sofa(x$Value[isCrea])
     isCirc <- x$Type %in% c("DOB", "IBP", "NOR")
     x$SubScore[isCirc] <- .circulation2sofa(x$Value[isCirc], x$Type[isCirc])
 
@@ -102,7 +106,7 @@ addSofa <- function(x, na.rm=FALSE) {
     sb$Type <- "HORV"
     sb$Value <- sb$Horovitz
     sb$Description <- "Horovitz"
-    rbind(x, sb[, c("CaseId", "Date", "Description", "Value", "Type", "SubScore")])
+    rbind(x, sb[, colnames(x), drop=FALSE])
 }
 
 #' SOFA Score
