@@ -85,6 +85,8 @@ addSofa <- function(x, na.rm=FALSE) {
         origin="1970-01-01 00:00:00",
         tz="UTC"
     )
+    ## If FiO2 is missing assume 0.21
+    sb$FiO2[is.na(sb$FiO2)] <- 0.21
     sb$diff <- sb$Date - sb$FiO2Date
     ## If diff time larger than 3600 sec set FiO2 to 0.21 (in general FiO2 is
     ## sampled every 1800 sec).
