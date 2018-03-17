@@ -57,7 +57,7 @@ plotSofa <- function(x, path, timepoints) {
     d <- data.frame(
         nms=c("IBP", "DOB", "NOR", "SOFA"),
         lnms=c("Mean (Non)-Invasive Blood Pressure [mmHg]", "Dobutamine [ml/h]",
-               "Norepinephrine [µg/kg/min]", "SOFA Subscore"),
+               "Norepinephrine [\u00B5g/kg/min]", "SOFA Subscore"),
         col=c("#E31A1C", "#6A3D9A", "#CAB2D6", "#B15928"),
         pch=c(20, 20, 20, 15),
         scl=c(150L, 10L, 1L, 4L),
@@ -69,7 +69,7 @@ plotSofa <- function(x, path, timepoints) {
 
     d <- data.frame(
         nms=c("BIL", "SOFA"),
-        lnms=c("Bilirubin [µmol/l]", "SOFA Subscore"),
+        lnms=c("Bilirubin [\u00B5mol/l]", "SOFA Subscore"),
         col=c("#33A02C", "#B15928"),
         pch=c(20, 15),
         scl=c(200L, 4L),
@@ -93,7 +93,7 @@ plotSofa <- function(x, path, timepoints) {
 
     d <- data.frame(
         nms=c("CRE", "SOFA"),
-        lnms=c("Creatinine [µmol/l]", "SOFA Subscore"),
+        lnms=c("Creatinine [\u00B5mol/l]", "SOFA Subscore"),
         col=c("#FDBF6F", "#B15928"),
         pch=c(20, 15),
         scl=c(450L, 4L),
