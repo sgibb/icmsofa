@@ -4,17 +4,14 @@
 \alias{importIcm}
 \title{Import ICM data}
 \usage{
-importIcm(file, sheets = c(PAO = "PO2", FIO = "FIO", NOR = "Noradrenalin", DOB
-  = "Dobutamin", IBP = "IBPm", BIL = "Bilirubin", PLT = "Thrombozyten", CRE =
-  "Kreatinin"), columns = c(Id = "fallnummer", Date = "admindate", Description
-  = "treatmentname", Value = "num"))
+importIcm(file, columns = c(CaseId = "FALLNUMMER", Date = "ADMINDATE",
+  TreatmentId = "TREATMENTID", Description = "TREATMENTNAME", Value =
+  "NUMVALUE", Duration = "DURATION"))
 }
 \arguments{
 \item{file}{\code{character}, filename}
 
-\item{sheets}{\code{character}, sheet names}
-
-\item{columns}{\code{character}, colum names}
+\item{columns}{\code{character}, column names}
 }
 \value{
 data.frame
