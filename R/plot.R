@@ -7,13 +7,13 @@
 #' @param timepoints `data.frame`, with timepoints
 #' @export
 plotSofa <- function(x, path, timepoints) {
-    invisible(lapply(split(x, x$Id), function(sb) {
+    invisible(lapply(split(x, x$CaseId), function(sb) {
         .plotSofa(
             sb,
-            file=file.path(path, paste(sb$Id[1L], "png", sep=".")),
+            file=file.path(path, paste(sb$CaseId[1L], "png", sep=".")),
             timepoints=unlist(
                 timepoints[
-                    timepoints[,1L] == sb$Id[1L],
+                    timepoints[,1L] == sb$CaseId[1L],
                     seq_len(ncol(timepoints) - 1L) + 1L,
                     drop=TRUE
                 ]
@@ -230,5 +230,5 @@ plotSofa <- function(x, path, timepoints) {
         "bottomright", legend="SOFA Score", col="#B15928", pch=20L, lwd=1L,
         bty="n"
     )
-    title(sub=x$Id[1L], adj=1L, cex=2L)
+    title(sub=x$CaseId[1L], adj=1L, cex=2L)
 }
