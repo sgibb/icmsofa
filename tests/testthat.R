@@ -1,4 +1,4 @@
 library("testthat")
-library("sofa")
+library("icmsofa")
 
-test_check("sofa")
+test_check("icmsofa")
