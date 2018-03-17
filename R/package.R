@@ -4,6 +4,10 @@
 #' @references \url{https://github.com/sgibb/icmsofa/}
 #' @keywords package
 #'
+#' @importFrom grDevices dev.off png
+#' @importFrom graphics abline axis layout legend mtext par plot points text
+#'  title
+#' @importFrom utils read.table write.csv
 #' @importFrom readxl read_excel
 #'
 "_PACKAGE"
