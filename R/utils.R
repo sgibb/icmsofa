@@ -59,7 +59,7 @@
 .sofaTypeId <- function(x) {
     stopifnot(is.character(x))
     id <- c(
-        "HOR"=1L, "DOB"=2L, "NOR"=2L, "IBP"=2L, "BIL"=3L, "PLT"=4L, "CRE"=5L
+        "HORV"=1L, "DOB"=2L, "NOR"=2L, "IBP"=2L, "BILI"=3L, "PLT"=4L, "CREA"=5L
     )
     unname(id[x])
 }

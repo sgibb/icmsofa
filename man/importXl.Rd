@@ -7,7 +7,7 @@
 importXl(file, sheets = c(PAO2 = "PO2", FIO2 = "FIO", NOR = "Noradrenalin",
   DOB = "Dobutamin", IBP = "IBPm", BILI = "Bilirubin", PLT = "Thrombozyten",
   CREA = "Kreatinin"), columns = c(CaseId = "fallnummer", Date = "admindate",
-  Description = "treatmentname", Value = "num"))
+  Description = "treatmentname", Value = "num"), verbose = interactive())
 }
 \arguments{
 \item{file}{\code{character}, filename}
@@ -15,6 +15,8 @@ importXl(file, sheets = c(PAO2 = "PO2", FIO2 = "FIO", NOR = "Noradrenalin",
 \item{sheets}{\code{character}, sheet names}
 
 \item{columns}{\code{character}, column names}
+
+\item{verbose}{\code{logical}, verbose output?}
 }
 \value{
 data.frame

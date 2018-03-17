@@ -6,12 +6,14 @@
 \usage{
 importIcm(file, columns = c(CaseId = "FALLNUMMER", Date = "ADMINDATE",
   TreatmentId = "TREATMENTID", Description = "TREATMENTNAME", Value =
-  "NUMVALUE", Duration = "DURATION"))
+  "NUMVALUE", Duration = "DURATION"), verbose = interactive())
 }
 \arguments{
 \item{file}{\code{character}, filename}
 
 \item{columns}{\code{character}, column names}
+
+\item{verbose}{\code{logical}, verbose output?}
 }
 \value{
 data.frame

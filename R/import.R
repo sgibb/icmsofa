@@ -5,6 +5,7 @@
 #' @param file `character`, filename
 #' @param sheets `character`, sheet names
 #' @param columns `character`, column names
+#' @param verbose `logical`, verbose output?
 #' @return data.frame
 #' @export
 importXl <- function(file, sheets=c(PAO2="PO2",
@@ -15,21 +16,22 @@ importXl <- function(file, sheets=c(PAO2="PO2",
                                     BILI="Bilirubin",
                                     PLT="Thrombozyten",
                                     CREA="Kreatinin"),
-                      columns=c(CaseId="fallnummer", Date="admindate",
-                                Description="treatmentname", Value="num")) {
+                     columns=c(CaseId="fallnummer", Date="admindate",
+                               Description="treatmentname", Value="num"),
+                     verbose=interactive()) {
     tbl <- lapply(names(sheets), function(nms) {
         sheet <- sheets[nms]
         tbl <- read_excel(file, sheet)[, columns]
         colnames(tbl) <- names(columns)
-        tbl <- tbl[!is.na(tbl$Id), ]
+        tbl <- tbl[!is.na(tbl$CaseId), ]
         tbl <- unique(tbl)
         tbl$Type <- nms
         as.data.frame(tbl, stringsAsFactors=FALSE)
     })
     tbl <- do.call(rbind, tbl)
-    colnames(tbl) <- names(columns)
+    colnames(tbl) <- c(names(columns), "Type")
 
-    .import(tbl)
+    .import(tbl, verbose)
 }
 
 #' Import ICM data
@@ -38,13 +40,15 @@ importXl <- function(file, sheets=c(PAO2="PO2",
 #'
 #' @param file `character`, filename
 #' @param columns `character`, column names
+#' @param verbose `logical`, verbose output?
 #' @return data.frame
 #' @export
 importIcm <- function(file,
                       columns=c(CaseId="FALLNUMMER", Date="ADMINDATE",
                                 TreatmentId="TREATMENTID",
                                 Description="TREATMENTNAME",
-                                Value="NUMVALUE", Duration="DURATION")) {
+                                Value="NUMVALUE", Duration="DURATION"),
+                      verbose=interactive()) {
     tbl <- read.table(
         file,
         dec=",", sep="\t", header=TRUE,
@@ -55,21 +59,37 @@ importIcm <- function(file,
 
     tbl$Type <- .treatmentIdType(tbl$TreatmentId)
 
-    .import(tbl)
+    .import(tbl, verbose)
 }
 
 #' Fix and Reorder ICM import
 #'
 #' @param tbl `data.frame`
+#' @param verbose `logical`, verbose output?
 #'
 #' @noRd
-.import <- function(tbl) {
+.import <- function(tbl, verbose=interactive()) {
     tbl$Date <- as.POSIXct(tbl$Date, origin="1970-01-01 00:00:00", tz="UTC")
 
+    if (verbose) {
+        message("Inspect PaO2 values ...")
+    }
+    tbl$Value[tbl$Type == "PAO2"] <-
+        .filterPaO2(tbl$Value[tbl$Type == "PAO2"], verbose=verbose)
+    if (verbose) {
+        message("Inspect PaO2 values ...")
+    }
+    tbl$Value[tbl$Type == "FIO2"] <-
+        .filterFiO2(tbl$Value[tbl$Type == "FIO2"], verbose=verbose)
+    if (verbose) {
+        message("Inspect (N)IBP values ...")
+    }
     isBp <- grepl("^N?IBP$", tbl$Type)
-    tbl$Value[isBp] <- .filterIbp(tbl$Value[isBp])
+    tbl$Value[isBp] <- .filterIbp(tbl$Value[isBp], verbose=verbose)
 
-    tbl[order(tbl$CaseId, tbl$Date),]
+    tbl <- tbl[order(tbl$CaseId, tbl$Date),]
+    rownames(tbl) <- NULL
+    tbl
 }
 
 #' Import timepoint data.

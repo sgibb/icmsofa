@@ -23,9 +23,9 @@ addSofa <- function(x, na.rm=FALSE) {
     x$SubScore <- NA_integer_
 
     ## easy scores
-    x$SubScore[x$Type == "BIL"] <- .bilirubin2sofa(x$Value[x$Type == "BIL"])
+    x$SubScore[x$Type == "BILI"] <- .bilirubin2sofa(x$Value[x$Type == "BILI"])
     x$SubScore[x$Type == "PLT"] <- .platelets2sofa(x$Value[x$Type == "PLT"])
-    x$SubScore[x$Type == "CRE"] <- .creatinine2sofa(x$Value[x$Type == "CRE"])
+    x$SubScore[x$Type == "CREA"] <- .creatinine2sofa(x$Value[x$Type == "CREA"])
     isCirc <- x$Type %in% c("DOB", "IBP", "NOR")
     x$SubScore[isCirc] <- .circulation2sofa(x$Value[isCirc], x$Type[isCirc])
 
@@ -69,16 +69,16 @@ addSofa <- function(x, na.rm=FALSE) {
 #' @return `data.frame`
 #' @noRd
 .addRespiratorySubScore <- function(x) {
-    sb <- x[x$Type %in% c("PAO", "FIO"),]
+    sb <- x[x$Type %in% c("PAO2", "FIO2"),]
 
     if (!nrow(sb)) {
         return(x)
     }
 
     sb$FiO2Date <- sb$FiO2 <- sb$PaO2 <- NA_real_
-    sb$FiO2[sb$Type == "FIO"] <- sb$Value[sb$Type == "FIO"]
-    sb$PaO2[sb$Type == "PAO"] <- sb$Value[sb$Type == "PAO"]
-    sb$FiO2Date[sb$Type == "FIO"] <- sb$Date[sb$Type == "FIO"]
+    sb$FiO2[sb$Type == "FIO2"] <- sb$Value[sb$Type == "FIO2"]
+    sb$PaO2[sb$Type == "PAO2"] <- sb$Value[sb$Type == "PAO2"]
+    sb$FiO2Date[sb$Type == "FIO2"] <- sb$Date[sb$Type == "FIO2"]
     sb$FiO2 <- .fillNa(sb$FiO2)
     sb$FiO2Date <- as.POSIXct(
         .fillNa(sb$FiO2Date),
@@ -93,11 +93,11 @@ addSofa <- function(x, na.rm=FALSE) {
     sb$Horovitz <- .horovitz(sb$PaO2, sb$FiO2)
     ## Assumen ventilation for FiO2 > 0.21
     sb$SubScore <- .horovitz2sofa(sb$Horovitz, ventilation=sb$FiO2 > 0.21)
-    sb <- sb[sb$Type == "PAO" & !is.na(sb$Horovitz), ]
+    sb <- sb[sb$Type == "PAO2" & !is.na(sb$Horovitz), ]
     if (!nrow(sb)) {
         return(x)
     }
-    sb$Type <- "HOR"
+    sb$Type <- "HORV"
     sb$Value <- sb$Horovitz
     sb$Description <- "Horovitz"
     rbind(x, sb[, c("CaseId", "Date", "Description", "Value", "Type", "SubScore")])

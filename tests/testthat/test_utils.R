@@ -34,6 +34,6 @@ test_that(".maxNa", {
 test_that(".sofaTypeId", {
     expect_error(icmsofa:::.sofaTypeId(1:10))
     expect_equal(icmsofa:::.sofaTypeId(
-        c("HOR", "DOB", "NOR", "IBP", "BIL", "PLT", "CRE", "FOO")),
+        c("HORV", "DOB", "NOR", "IBP", "BILI", "PLT", "CREA", "FOO")),
         c(1, 2, 2, 2, 3:5, NA))
 })
