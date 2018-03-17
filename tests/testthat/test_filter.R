@@ -29,4 +29,28 @@ test_that(".filterRange", {
     expect_silent(icmsofa:::.filterRange(1:10, c(0, 11), verbose=TRUE))
     expect_equal(icmsofa:::.filterRange(1:10, c(2, 9), verbose=FALSE),
                  c(NA, 2:9, NA))
+    expect_equal(icmsofa:::.filterRange(c(NA, 1:10), c(2, 9), verbose=FALSE),
+                 c(NA, NA, 2:9, NA))
+})
+
+test_that(".filterBga", {
+    d <- data.frame(CaseId=1,
+                    Date=rep(1:3, each=2),
+                    Type=c("BGA", "PAO2", "BGA", "PAO2", "BGA", "PAO2"),
+                    Value=c(1, 100, 2, 50, 9, 0),
+                    stringsAsFactors=FALSE)
+    expect_equal(icmsofa:::.filterBga(d, keep=c("a", "v", "m")), d)
+    r <- d
+    r$Value[c(4, 6)] <- NA
+    expect_equal(icmsofa:::.filterBga(d, keep="a"), r)
+    r <- d
+    r$Value[6] <- NA
+    expect_equal(icmsofa:::.filterBga(d, keep=c("a", "v")), r)
+    r <- d
+    r$Value[c(2, 4)] <- NA
+    expect_message(icmsofa:::.filterBga(d, keep=c("a", "v"), verbose=TRUE),
+                   "1 paO2 values removed")
+    expect_silent(icmsofa:::.filterBga(d, keep=c("a", "v"), verbose=FALSE))
+    expect_equal(icmsofa:::.filterBga(d, keep=("m")), r)
+    expect_error(icmsofa:::.filterBga(d, keep=""))
 })

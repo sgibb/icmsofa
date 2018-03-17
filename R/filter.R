@@ -57,3 +57,27 @@
     x[isOOR] <- NA_real_
     x
 }
+
+#' Keep just art/ven BGA
+#'
+#' @param x `data.frame`
+#' @param keep `character`, which BGA to keep
+#' @param verbose `logical`, verbose output?
+#' @return `data.frame`
+#' @noRd
+.filterBga <- function(x, keep=c("arterial", "venous", "misc"),
+                       verbose=interactive()) {
+    keep <- match.arg(keep, several.ok=TRUE)
+    mapping <- c(arterial=1L, venous=2L, misc=9L)
+    isBga <- x$Type == "BGA" & !is.na(x$Type)
+    d <- x$Date[isBga & !x$Value %in% mapping[keep]]
+    toRemove <- x$Type == "PAO2" & !is.na(x$Type) & x$Date %in% d
+    if (verbose && any(toRemove)) {
+        message(
+            sum(toRemove), " paO2 values removed because they are not ",
+            paste(keep, collapse=" or "), "."
+        )
+    }
+    x$Value[toRemove] <- NA_real_
+    x
+}
