@@ -4,7 +4,8 @@ Version: 0.0.1
 Authors@R: person("Sebastian", "Gibb", role=c("aut", "cre"),
                   email="mail@sebastiangibb.de",
                   comment=c(ORCID="0000-0001-7406-4443"))
-Description: Sequential Organ Failure Assessment (SOFA) Score
+Description: This package is used to calculate Sequential Organ Failure
+    Assessment (SOFA) Score from exported data of Dräger's ICM database.
 Depends:
     R (>= 3.4)
 Imports:
