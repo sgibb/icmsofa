@@ -3,11 +3,12 @@
 #' Add SOFA scores to `data.frame`
 #'
 #' @param x `data.frame`
+#' @param na.rm `logical`, should missing values replaced by zero?
 #' @return `data.frame`
 #' @export
-addSofa <- function(x) {
+addSofa <- function(x, na.rm=FALSE) {
     x <- .addSubScores(x)
-    x <- .addSofaScores(x)
+    x <- .addSofaScores(x, na.rm=na.rm)
     x
 }
 
@@ -29,8 +30,8 @@ addSofa <- function(x) {
     x$SubScore[isCirc] <- .circulation2sofa(x$Value[isCirc], x$Type[isCirc])
 
     ## complicated scores
-    x <- do.call("rbind", lapply(split(x, x$Id), .addRespiratorySubScore))
-    x <- x[order(x$Id, x$Date),]
+    x <- do.call("rbind", lapply(split(x, x$CaseId), .addRespiratorySubScore))
+    x <- x[order(x$CaseId, x$Date),]
 
     ## remove useless rownames
     rownames(x) <- NULL
@@ -42,22 +43,23 @@ addSofa <- function(x) {
 #' Add the sofa-scores to the data.frame.
 #'
 #' @param x `data.frame`
+#' @param na.rm `logical`, should missing values replaced by zero?
 #' @return `data.frame`
 #' @noRd
-.addSofaScores <- function(x) {
-    x$Sofa <- NA_integer_
+.addSofaScores <- function(x, na.rm=FALSE) {
+    x$Sofa <- ifelse(na.rm, 0L, NA_integer_)
     x$TypeId <- .sofaTypeId(x$Type)
 
-    ## complicated scores
-    x <- do.call("rbind", lapply(split(x, x$Id), .calculateSofa))
+    x <- do.call(
+        "rbind",
+        lapply(split(x, x$CaseId), .calculateSofa, na.rm=na.rm)
+    )
 
     ## remove useless column and rownames
     x <- x[, colnames(x) != "TypeId", drop=FALSE]
     rownames(x) <- NULL
     x
 }
-
-
 
 #' Add Respiratory Subscore.
 #'
@@ -98,7 +100,7 @@ addSofa <- function(x) {
     sb$Type <- "HOR"
     sb$Value <- sb$Horovitz
     sb$Description <- "Horovitz"
-    rbind(x, sb[, c("Id", "Date", "Description", "Value", "Type", "SubScore")])
+    rbind(x, sb[, c("CaseId", "Date", "Description", "Value", "Type", "SubScore")])
 }
 
 #' SOFA Score
@@ -106,9 +108,10 @@ addSofa <- function(x) {
 #' Calculate 24 h SOFA-Score.
 #'
 #' @param x `data.frame`
+#' @param na.rm `logical`, should missing values replaced by zero?
 #' @return `data.frame`
 #' @noRd
-.calculateSofa <- function(x) {
+.calculateSofa <- function(x, na.rm=FALSE) {
     for (i in seq_len(nrow(x))) {
         sel <- (x$Date[i] - 24L * 3600L) < x$Date[i] & x$Date < x$Date[i]
         if (any(sel)) {
@@ -119,7 +122,8 @@ addSofa <- function(x) {
                         1L:5L,
                         function(ti).maxNa(sb$SubScore[sb$TypeId == ti]),
                         NA_integer_
-                    )
+                    ),
+                    na.rm=na.rm
                 )
         }
     }

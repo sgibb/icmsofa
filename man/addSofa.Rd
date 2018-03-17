@@ -4,10 +4,12 @@
 \alias{addSofa}
 \title{Add SOFA scores.}
 \usage{
-addSofa(x)
+addSofa(x, na.rm = FALSE)
 }
 \arguments{
 \item{x}{\code{data.frame}}
+
+\item{na.rm}{\code{logical}, should missing values replaced by zero?}
 }
 \value{
 \code{data.frame}
