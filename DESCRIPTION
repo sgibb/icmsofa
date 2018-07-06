@@ -8,6 +8,8 @@ Description: This package is used to calculate Sequential Organ Failure
     Assessment (SOFA) Score from exported data of Dräger's ICM database.
 Depends:
     R (>= 3.4)
+Imports:
+    readxl
 Suggests:
     testthat
 License: GPL (>= 3)

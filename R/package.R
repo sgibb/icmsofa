@@ -8,5 +8,6 @@
 #' @importFrom graphics abline axis layout legend mtext par plot points text
 #'  title
 #' @importFrom utils read.table write.csv
+#' @importFrom readxl read_excel
 #'
 "_PACKAGE"
