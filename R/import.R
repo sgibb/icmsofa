@@ -46,10 +46,11 @@ importXl <- function(file, sheets=c(PAO2="PO2",
 #' @return data.frame
 #' @export
 importIcm <- function(file,
-                      columns=c(CaseId="FALLNUMMER", Date="ADMINDATE",
+                      columns=c(CaseId="HIS_CASEID", Date="ADMINDATE",
                                 TreatmentId="TREATMENTID",
                                 Description="TREATMENTNAME",
-                                Value="NUMVALUE", Duration="DURATION"),
+                                Value="NUMVALUE", Dose="DOSE",
+                                Begin="BEGIN", End="END"),
                       verbose=interactive()) {
     tbl <- read.table(
         file,
@@ -61,7 +62,14 @@ importIcm <- function(file,
 
     tbl$Type <- .treatmentIdType(tbl$TreatmentId)
 
+    isDrug <- tbl$Type %in% c("DOB", "NOR")
+    tbl$Value[isDrug] <- tbl$Dose[isDrug]
+
     tbl$Date <- as.POSIXct(tbl$Date, format="%d.%m.%y %H:%M:%S",
+                           origin="1970-01-01 00:00:00", tz="UTC")
+    tbl$Begin <- as.POSIXct(tbl$Begin, format="%d.%m.%y %H:%M:%S",
+                           origin="1970-01-01 00:00:00", tz="UTC")
+    tbl$End <- as.POSIXct(tbl$End, format="%d.%m.%y %H:%M:%S",
                            origin="1970-01-01 00:00:00", tz="UTC")
 
     .import(tbl, verbose)
@@ -75,16 +83,24 @@ importIcm <- function(file,
 #' @noRd
 .import <- function(tbl, verbose=interactive()) {
     if (verbose) {
+        message("Drop entries with missing treatment types ...")
+    }
+    isNa <- is.na(tbl$Type)
+    tbl <- tbl[!isNa,, drop=FALSE]
+    if (verbose) {
+        message(sum(isNa), " entries removed because treatment type is missing.")
+    }
+    if (verbose) {
         message("Inspect BGA values ...")
     }
     tbl <- .filterBga(tbl, keep="arterial", verbose=verbose)
     if (verbose) {
-        message("Inspect paO2 values ...")
+        message("Inspect PaO2 values ...")
     }
     isPaO2 <- tbl$Type == "PAO2" & !is.na(tbl$Type)
     tbl$Value[isPaO2] <- .filterPaO2(tbl$Value[isPaO2], verbose=verbose)
     if (verbose) {
-        message("Inspect PaO2 values ...")
+        message("Inspect FiO2 values ...")
     }
     isFiO2 <- tbl$Type == "FIO2" & !is.na(tbl$Type)
     tbl$Value[isFiO2] <- .filterFiO2(tbl$Value[isFiO2], verbose=verbose)
