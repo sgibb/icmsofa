@@ -4,9 +4,10 @@
 \alias{importIcm}
 \title{Import ICM data}
 \usage{
-importIcm(file, columns = c(CaseId = "FALLNUMMER", Date = "ADMINDATE",
+importIcm(file, columns = c(CaseId = "HIS_CASEID", Date = "ADMINDATE",
   TreatmentId = "TREATMENTID", Description = "TREATMENTNAME", Value =
-  "NUMVALUE", Duration = "DURATION"), verbose = interactive())
+  "NUMVALUE", Dose = "DOSE", Begin = "BEGIN", End = "END"),
+  verbose = interactive())
 }
 \arguments{
 \item{file}{\code{character}, filename}

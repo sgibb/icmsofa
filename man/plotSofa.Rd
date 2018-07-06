@@ -4,7 +4,7 @@
 \alias{plotSofa}
 \title{Plot SOFA scores}
 \usage{
-plotSofa(x, path, timepoints)
+plotSofa(x, path, timepoints = NULL)
 }
 \arguments{
 \item{x}{\code{data.frame}}
