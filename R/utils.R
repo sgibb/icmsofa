@@ -77,9 +77,12 @@
     mapping <- as.data.frame(matrix(c(
         # PAO2
         "1073", "PO2", "PAO2",
+        "2768", "PO2", "PAO2",
         "2794", "PO2 (mmHg)", "PAO2",
         "2813", "PO2 (Temp.) (mmHg)", "PAO2",
+        "3626", "paO2 (mmHg)", "PAO2",
         "3691", "PO2 (Temp.) (mmHg) LA", "PAO2",
+        "4397", "paO2 LA", "PAO2",
         "5686", "PO2(art_kap) (Temp.) (mmHg) LA", "PAO2",
         # BGA
         "2796", "BGA (Quelle)", "BGA",
@@ -91,6 +94,7 @@
         "4240", "FiO2 (%) Einstellung", "FIO2",
         "5052", "FiO2 (%) Einstellung", "FIO2",
         "5474", "Carina_FiO2 eingestellt", "FIO2",
+        "5492", "O2-Konzentration", "FIO2",
         # IBP
         "1646", "IBP m (mmHg)", "IBP",
         "1653", "NIBP m (mmHg)", "NIBP",
@@ -100,6 +104,7 @@
         "3493", "Dobutamin (500/50) Perf.", "DOB",
         "4968", "Dobutamin (500/50) Perf.", "DOB",
         # NOR
+        "1489", "Noradrenalin (Arterenol)", "NOR",
         "3466", "Noradrenalin ( 1/50) Perf.", "NOR",
         "4962", "Noradrenalin ( 1/50) Perf.", "NOR",
         "3467", "Noradrenalin ( 5/50) Perf.", "NOR",
@@ -120,10 +125,10 @@
         "2040", "Thrombocyten Citratblut", "PLT",
         # CREA
         "2057", "Kreatinin", "CREA",
-        # LAC
-        "2778", "Lactat", "LAC",
-        "3686", "Lactat (mmol/L) LA", "LAC",
-        "2054", "Lactat (mmol/l) LA", "LAC"
+        # LACT
+        "2778", "Lactat", "LACT",
+        "3686", "Lactat (mmol/L) LA", "LACT",
+        "2054", "Lactat (mmol/l) LA", "LACT"
         ), ncol=3L, byrow=TRUE,
         dimnames=list(NULL, c("Id", "Description", "Type"))
     ), stringsAsFactors=FALSE)
