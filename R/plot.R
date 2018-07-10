@@ -65,11 +65,12 @@ plotSofa <- function(x, path, timepoints=NULL) {
 
     d <- data.frame(
         nms=c("IBP", "DOB", "NOR", "SOFA"),
-        lnms=c("Mean (Non)-Invasive Blood Pressure [mmHg]", "Dobutamine [ml/h]",
+        lnms=c("Mean (Non)-Invasive Blood Pressure [mmHg]",
+               "Dobutamine [\u00B5g/kg/min]",
                "Norepinephrine [\u00B5g/kg/min]", "SOFA Subscore"),
         col=c("#E31A1C", "#6A3D9A", "#CAB2D6", "#B15928"),
         pch=c(20, 20, 20, 15),
-        scl=c(150L, 10L, 1L, 4L),
+        scl=c(150L, 5L, 0.3, 4L),
         line=c(0L, 3L, 6L, 0L),
         side=c(2L, 2L, 2L, 4L),
         stringsAsFactors=FALSE
