@@ -97,7 +97,7 @@
         "5492", "O2-Konzentration", "FIO2",
         # IBP
         "1646", "IBP m (mmHg)", "IBP",
-        "1653", "NIBP m (mmHg)", "NIBP",
+        "1653", "NIBP m (mmHg)", "IBP",
         # DOB
         "275", "Dobutamin (250/50) Perf.", "DOB",
         "4967", "Dobutamin (250/50) Perf.", "DOB",
