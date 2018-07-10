@@ -125,6 +125,7 @@
         "2040", "Thrombocyten Citratblut", "PLT",
         # CREA
         "2057", "Kreatinin", "CREA",
+        "2061", "Kreatinin", "CREA",
         # LACT
         "2778", "Lactat", "LACT",
         "3686", "Lactat (mmol/L) LA", "LACT",
