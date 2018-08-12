@@ -49,6 +49,20 @@
     }
 }
 
+#' Previous 24 hours
+#'
+#' Return ids of last 24 hours
+#'
+#' @param x `POSIXct`, dates
+#' @param ref `POSIXct`, reference date
+#' @return `logical`
+#' @noRd
+.prev24h <- function(x, ref) {
+    stopifnot(inherits(x, "POSIXct"))
+    stopifnot(inherits(ref, "POSIXct"))
+    ref - 24L * 3600 <= x & x <= ref
+}
+
 #' SOFA id
 #'
 #' Turn different `Type` values into an ID

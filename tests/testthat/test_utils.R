@@ -31,6 +31,22 @@ test_that(".maxNa", {
     expect_equal(icmsofa:::.maxNa(NULL), NA_integer_)
 })
 
+test_that(".prev24h", {
+    x <- as.POSIXct(c("2018-08-11 21:40", "2018-08-11 21:44",
+                      "2018-08-11 21:45", "2018-08-11 21:46",
+                      "2018-08-12 21:45", "2018-08-12 21:46"),
+                    format="%Y-%m-%d %H:%M",
+                    origin="1970-01-01 00:00", tz="UTC")
+    expect_error(icmsofa:::.prev24h(1:10, 2))
+    expect_error(icmsofa:::.prev24h(x, 2))
+    expect_equal(icmsofa:::.prev24h(x, x[4]),
+                 c(TRUE, TRUE, TRUE, TRUE, FALSE, FALSE))
+    expect_equal(icmsofa:::.prev24h(x, x[5]),
+                 c(FALSE, FALSE, TRUE, TRUE, TRUE, FALSE))
+    expect_equal(icmsofa:::.prev24h(x, x[6]),
+                 c(FALSE, FALSE, FALSE, TRUE, TRUE, TRUE))
+})
+
 test_that(".sofaTypeId", {
     expect_error(icmsofa:::.sofaTypeId(1:10))
     expect_equal(icmsofa:::.sofaTypeId(

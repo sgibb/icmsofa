@@ -119,7 +119,7 @@ addSofa <- function(x, na.rm=FALSE) {
 #' @noRd
 .calculateSofa <- function(x, na.rm=FALSE) {
     for (i in seq_len(nrow(x))) {
-        sel <- (x$Date[i] - 24L * 3600L) < x$Date[i] & x$Date <= x$Date[i]
+        sel <- .prev24h(x$Date, ref=x$Date[i])
         if (any(sel)) {
             sb <- x[sel, , drop=FALSE]
             x$Sofa[i] <-
