@@ -35,17 +35,17 @@
 #' Bilirubin to SOFA
 #'
 #' Bilirubin (mg/dl) [μmol/L] 	SOFA score
-#' < 1.2 [< 20] 	0
-#' 1.2–1.9 [20-32] 	1
+#' < 1.2 [< 20] 	    0
+#' 1.2–1.9 [20-32] 	    1
 #' 2.0–5.9 [33-101] 	2
 #' 6.0–11.9 [102-204] 	3
-#' > 12.0 [> 204] 	4
+#' > 12.0 [> 204] 	    4
 #'
 #' @param x double, bilirubin (in µmol/l)
 #' @return integer, 0:4
 #' @noRd
 .bilirubin2sofa <- function(x) {
-    as.integer(cut(x, c(0L, 20, 33, 102, 205, Inf), right=FALSE)) - 1L
+    .bincode(x, c(0L, 20, 33, 102, 205, Inf), right=FALSE) - 1L
 }
 
 #' Platelets to SOFA
@@ -61,7 +61,7 @@
 #' @return integer, 0:4
 #' @noRd
 .platelets2sofa <- function(x) {
-    5L - as.integer(cut(x, c(0L, 20, 50, 100, 150, Inf), right=FALSE))
+    5L - .bincode(x, c(0L, 20, 50, 100, 150, Inf), right=FALSE)
 }
 
 #' Creatinine to SOFA
@@ -77,5 +77,5 @@
 #' @return integer, 0:4
 #' @noRd
 .creatinine2sofa <- function(x) {
-    as.integer(cut(x, c(0L, 110, 171, 300, 441, Inf), right=FALSE)) - 1L
+    .bincode(x, c(0L, 110, 171, 300, 441, Inf), right=FALSE) - 1L
 }
