@@ -103,6 +103,7 @@ importIcm <- function(file,
         message("Inspect FiO2 values ...")
     }
     isFiO2 <- tbl$Type == "FIO2" & !is.na(tbl$Type)
+    tbl$Value[isFiO2] <- ifelse(tbl$Value[isFiO2] > 20L, tbl$Value[isFiO2] / 100L, tbl$Value[isFiO2])
     tbl$Value[isFiO2] <- .filterFiO2(tbl$Value[isFiO2], verbose=verbose)
     if (verbose) {
         message("Inspect (N)IBP values ...")
