@@ -121,6 +121,10 @@
         "5052", "FiO2 (%) Einstellung", "FIO2",
         "5474", "Carina_FiO2 eingestellt", "FIO2",
         "5492", "O2-Konzentration", "FIO2",
+        # O2INS
+        "1303", "O2-Insufflation", "O2INS",
+        "2623", "Sauerstoff-Verabreichung", "O2INS",
+        "4598", "O2-Insufflation", "O2INS",
         # IBP
         "1646", "IBP m (mmHg)", "IBP",
         "1653", "NIBP m (mmHg)", "IBP",
