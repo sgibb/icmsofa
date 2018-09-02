@@ -2,19 +2,20 @@
 #'
 #' based on http://www.cscc.imise.uni-leipzig.de/Studien/MEDUSA/CRF-Patient/Konversionstabelle-Oxygenierungsindex.pdf
 #'
-#' O2-Flow  Geschätzte
-#' (l/min)  FiO2
-#' Nasensonde, Nasenbrille
+#' O2-Flow (l/min)  estimated FiO2
+#' nasula canula
 #' 1  0,24
 #' 2  0,28
 #' 3  0,32
 #' 4  0,36
 #' 5  0,40
 #' 6  0,44
-#' Gesichtsmaske
+#' face mask
 #' 5    0,40
 #' 6-7  0,50
 #' 7-8  0,60
+#'
+#' we ignore the application form:
 #'
 #' @param x double, O2 flow rate
 #' @return double, estimated FiO2
