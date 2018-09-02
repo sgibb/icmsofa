@@ -84,11 +84,8 @@ addSofa <- function(x, na.rm=FALSE) {
     sb$PaO2[sb$Type == "PAO2"] <- sb$Value[sb$Type == "PAO2"]
     sb$FiO2Date[sb$Type == "FIO2"] <- sb$Date[sb$Type == "FIO2"]
     sb$FiO2 <- .fillNa(sb$FiO2)
-    sb$FiO2Date <- as.POSIXct(
-        .fillNa(sb$FiO2Date),
-        origin="1970-01-01 00:00:00",
-        tz="UTC"
-    )
+    sb$FiO2Date <- .asPosixCt(.fillNa(sb$FiO2Date))
+
     ## If FiO2 is missing assume 0.21
     sb$FiO2[is.na(sb$FiO2)] <- 0.21
     sb$diff <- sb$Date - sb$FiO2Date

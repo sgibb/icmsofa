@@ -1,5 +1,12 @@
 context("utils")
 
+test_that(".asPosixCt", {
+    expect_equal(icmsofa:::.asPosixCt("26.02.14 22:50:10"),
+        as.POSIXct("2014-02-26 22:50:10", tz="UTC"))
+    expect_equal(icmsofa:::.asPosixCt("26022014 225010", "%d%m%Y %H%M%S"),
+        as.POSIXct("2014-02-26 22:50:10", tz="UTC"))
+})
+
 test_that(".daily", {
     expect_equal(icmsofa:::.daily(as.POSIXct(
         c("2014-02-26 22:50:10 UTC", "2014-02-27 00:02:00 UTC",

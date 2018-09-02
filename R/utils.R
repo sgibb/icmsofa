@@ -1,3 +1,15 @@
+#' Convert to POSIXct
+#'
+#' as.POSIXct with own defaults
+#'
+#' @param x `character`, date
+#' @param format `character`, format
+#' @return `POSIXct`
+#' @noRd
+.asPosixCt <- function(x, format="%d.%m.%y %H:%M:%S") {
+    as.POSIXct(x, format=format, origin="1970-01-01 00:00:00", tz="UTC")
+}
+
 #' Daily dates
 #'
 #' daily dates, limits rounded to the previous/next day

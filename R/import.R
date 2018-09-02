@@ -31,7 +31,7 @@ importXl <- function(file, sheets=c(PAO2="PO2",
     tbl <- do.call(rbind, tbl)
     colnames(tbl) <- c(names(columns), "Type")
 
-    tbl$Date <- as.POSIXct(tbl$Date, origin="1970-01-01 00:00:00", tz="UTC")
+    tbl$Date <- .asPosixCt(tbl$Date)
 
     .import(tbl, verbose)
 }
@@ -65,12 +65,9 @@ importIcm <- function(file,
     isDrug <- tbl$Type %in% c("DOB", "NOR")
     tbl$Value[isDrug] <- tbl$Dose[isDrug]
 
-    tbl$Date <- as.POSIXct(tbl$Date, format="%d.%m.%y %H:%M:%S",
-                           origin="1970-01-01 00:00:00", tz="UTC")
-    tbl$Begin <- as.POSIXct(tbl$Begin, format="%d.%m.%y %H:%M:%S",
-                           origin="1970-01-01 00:00:00", tz="UTC")
-    tbl$End <- as.POSIXct(tbl$End, format="%d.%m.%y %H:%M:%S",
-                           origin="1970-01-01 00:00:00", tz="UTC")
+    tbl$Date <- as.PosixCt(tbl$Date)
+    tbl$Begin <- as.PosixCt(tbl$Begin)
+    tbl$End <- as.PosixCt(tbl$End)
 
     .import(tbl, verbose)
 }
