@@ -51,10 +51,11 @@ importIcm <- function(file,
                                 Description="TREATMENTNAME",
                                 Value="NUMVALUE", Dose="DOSE",
                                 Begin="BEGIN", End="END"),
+                      sep="\t", dec=",",
                       verbose=interactive()) {
     tbl <- read.table(
         file,
-        dec=",", sep="\t", header=TRUE,
+        dec=dec, sep=sep, header=TRUE,
         stringsAsFactors=FALSE
     )
     tbl <- tbl[, columns, drop=FALSE]
@@ -62,7 +63,7 @@ importIcm <- function(file,
 
     tbl$Type <- .treatmentIdType(tbl$TreatmentId)
 
-    isDrug <- tbl$Type %in% c("DOB", "NOR")
+    isDrug <- tbl$Type %in% c("DOP", "DOB", "NOR")
     tbl$Value[isDrug] <- tbl$Dose[isDrug]
 
     tbl$Date <- as.PosixCt(tbl$Date)
