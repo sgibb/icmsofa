@@ -1,3 +1,30 @@
+#' Correct Begin and End Time for FiO2 data
+#'
+#' In contrast to perfusor data or O2 data the BEGIN and END times reflect the
+#' time when the order was initiated on the chart and not when the measurement
+#' starts or ends.
+#'
+#' Here we set BEGIN to ADMINDATE and END to the BEGIN of the next FiO2 value
+#' (or if it is above the threshold to BEGIN + threshold)
+#'
+#' @param x `data.frame`
+#' @param threshold `numeric`, threshold time in seconds
+#' @return `data.frame`
+#' @noRd
+.correctFiO2Times <- function(x, threshold=3600) {
+    isFiO2 <- x$Type == "FIO2" & x$Valid
+    sb <- x[isFiO2,]
+    sb$Begin <- sb$Date
+    nr <- nrow(sb)
+    samePatient <- sb$CaseId[-1L] == sb$CaseId[-nr]
+    sb$End[-nr][samePatient] <- sb$Begin[-1L][samePatient]
+
+    d <- difftime(sb$End, sb$Begin, units="secs") > threshold
+    sb$End[d] <- sb$Begin[d] + threshold
+    x[isFiO2,] <- sb
+    x
+}
+
 #' O2-Flow rate to FiO2
 #'
 #' based on http://www.cscc.imise.uni-leipzig.de/Studien/MEDUSA/CRF-Patient/Konversionstabelle-Oxygenierungsindex.pdf
