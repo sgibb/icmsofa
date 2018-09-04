@@ -84,12 +84,17 @@
 #'
 #' @param x `POSIXct`, dates
 #' @param ref `POSIXct`, reference date
+#' @param lag `numeric`, lag seconds added to reference date and extend the
+#' range to 24 h + lag seconds (e.g. laboratory values take some time)
 #' @return `logical`
 #' @noRd
-.prev24h <- function(x, ref) {
+.prev24h <- function(x, ref, lag=0) {
     stopifnot(inherits(x, "POSIXct"))
     stopifnot(inherits(ref, "POSIXct"))
-    ref - 24L * 3600 <= x & x <= ref
+    stopifnot(is.numeric(lag))
+    x <- as.numeric(x)
+    ref <- as.numeric(ref)
+    x %inrange% c(ref - 24L * 3600, ref + lag)
 }
 
 #' SOFA id

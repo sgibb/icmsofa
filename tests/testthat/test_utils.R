@@ -68,6 +68,8 @@ test_that(".prev24h", {
                  c(FALSE, FALSE, TRUE, TRUE, TRUE, FALSE))
     expect_equal(icmsofa:::.prev24h(x, x[6]),
                  c(FALSE, FALSE, FALSE, TRUE, TRUE, TRUE))
+    expect_equal(icmsofa:::.prev24h(x, x[3], 60),
+                 c(TRUE, TRUE, TRUE, TRUE, FALSE, FALSE))
 })
 
 test_that(".sofaTypeId", {
