@@ -66,9 +66,9 @@ importIcm <- function(file,
     isDrug <- tbl$Type %in% c("DOP", "DOB", "NOR")
     tbl$Value[isDrug] <- tbl$Dose[isDrug]
 
-    tbl$Date <- as.PosixCt(tbl$Date)
-    tbl$Begin <- as.PosixCt(tbl$Begin)
-    tbl$End <- as.PosixCt(tbl$End)
+    tbl$Date <- .asPosixCt(tbl$Date)
+    tbl$Begin <- .asPosixCt(tbl$Begin)
+    tbl$End <- .asPosixCt(tbl$End)
 
     .import(tbl, verbose)
 }
@@ -123,10 +123,6 @@ importIcm <- function(file,
 #' @export
 importTimepoints <- function(file) {
     tbl <- read_excel(file)
-    tbl[-1L] <- lapply(
-        tbl[-1L],
-        as.POSIXct,
-        format="%d.%m.%Y %H:%M", origin="1970-01-01 00:00:00", tz="UTC"
-    )
+    tbl[-1L] <- lapply(tbl[-1L], .asPosixCt)
     as.data.frame(tbl, stringsAsFactors=FALSE)
 }
