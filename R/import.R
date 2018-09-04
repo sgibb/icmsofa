@@ -1,43 +1,5 @@
 #' Import ICM data
 #'
-#' Import ICM XLS-Export.
-#'
-#' @param file `character`, filename
-#' @param sheets `character`, sheet names
-#' @param columns `character`, column names
-#' @param verbose `logical`, verbose output?
-#' @return data.frame
-#' @export
-importXl <- function(file, sheets=c(PAO2="PO2",
-                                    FIO2="FIO",
-                                    NOR="Noradrenalin",
-                                    DOB="Dobutamin",
-                                    IBP="IBPm",
-                                    BILI="Bilirubin",
-                                    PLT="Thrombozyten",
-                                    CREA="Kreatinin"),
-                     columns=c(CaseId="fallnummer", Date="admindate",
-                               Description="treatmentname", Value="num"),
-                     verbose=interactive()) {
-    tbl <- lapply(names(sheets), function(nms) {
-        sheet <- sheets[nms]
-        tbl <- read_excel(file, sheet)[, columns]
-        colnames(tbl) <- names(columns)
-        tbl <- tbl[!is.na(tbl$CaseId), ]
-        tbl <- unique(tbl)
-        tbl$Type <- nms
-        as.data.frame(tbl, stringsAsFactors=FALSE)
-    })
-    tbl <- do.call(rbind, tbl)
-    colnames(tbl) <- c(names(columns), "Type")
-
-    tbl$Date <- .asPosixCt(tbl$Date)
-
-    .import(tbl, verbose)
-}
-
-#' Import ICM data
-#'
 #' Import ICM SQL-Export.
 #'
 #' @param file `character`, filename
