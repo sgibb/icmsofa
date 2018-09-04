@@ -128,6 +128,9 @@
         # IBP
         "1646", "IBP m (mmHg)", "IBP",
         "1653", "NIBP m (mmHg)", "IBP",
+        # DOP
+        "277",  "Dopamin (500/50) Perf.", "DOP",
+        "3755", "Dopamin Perf", "DOP",
         # DOB
         "275", "Dobutamin (250/50) Perf.", "DOB",
         "4967", "Dobutamin (250/50) Perf.", "DOB",
