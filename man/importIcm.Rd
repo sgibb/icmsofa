@@ -6,8 +6,8 @@
 \usage{
 importIcm(file, columns = c(CaseId = "HIS_CASEID", Date = "ADMINDATE",
   TreatmentId = "TREATMENTID", Description = "TREATMENTNAME", Value =
-  "NUMVALUE", Dose = "DOSE", Begin = "BEGIN", End = "END"),
-  verbose = interactive())
+  "NUMVALUE", Dose = "DOSE", Begin = "BEGIN", End = "END"), sep = "\\t",
+  dec = ",", verbose = interactive())
 }
 \arguments{
 \item{file}{\code{character}, filename}

@@ -45,6 +45,23 @@
     seq(r[1L], r[2L], by=3600L)
 }
 
+#' Is value in range
+#'
+#' @param x `numeric`
+#' @param range `numeric`, allowed range
+#' @return logical
+#' @noRd
+.inRange <- function(x, range) {
+    stopifnot(is.numeric(x))
+    stopifnot(is.numeric(range) && length(range) == 2L)
+    if (range[1L] > range[2L]) {
+        x >= range[2L] & x <= range[1L]
+    } else {
+        x >= range[1L] & x <= range[2L]
+    }
+}
+"%inrange%" <- function(x, range) .inRange(x, range)
+
 #' Calculate maximum
 #'
 #' Calculate `max` and ignore `NA`, except everything is `NA`

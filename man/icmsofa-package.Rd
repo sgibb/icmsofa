@@ -7,7 +7,7 @@
 \title{icmsofa: Sequential Organ Failure Assessment (SOFA) Score}
 \description{
 This package is used to calculate Sequential Organ Failure
-Assessment (SOFA) Score from exported data of Dräger's ICM database.
+    Assessment (SOFA) Score from exported data of Dräger's ICM database.
 }
 \references{
 \url{https://github.com/sgibb/icmsofa/}

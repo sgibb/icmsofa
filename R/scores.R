@@ -28,7 +28,7 @@
 #' @noRd
 .circulation2sofa <- function(x, type) {
     ((type == "IBP") * (x < 70L)) +
-    ((type == "DOB") * 2L * !is.na(x)) +
+    ((type == "DOB") * 2L) +
     ((type == "NOR") * ((x > 0.1) + 3L))
 }
 

@@ -31,6 +31,22 @@ test_that(".hourly", {
                      "2014-02-27 00:00:00 UTC", "2014-02-27 01:00:00 UTC")))
 })
 
+test_that(".inRange", {
+    expect_error(icmsofa:::.inRange("A"))
+    expect_error(icmsofa:::.inRange(1:10))
+    expect_error(icmsofa:::.inRange(1:10, range="A"))
+    expect_error(icmsofa:::.inRange(1:10, range=1.0))
+    expect_equal(icmsofa:::.inRange(1:10, c(2, 9)),
+                 c(FALSE, rep(TRUE, 8), FALSE))
+    expect_equal(icmsofa:::.inRange(1:10, c(9, 2)),
+                 c(FALSE, rep(TRUE, 8), FALSE))
+    expect_equal(icmsofa:::.inRange(c(NA, 1:10), c(2, 9)),
+                 c(NA, FALSE, rep(TRUE, 8), FALSE))
+
+    expect_equal(1:10 %inrange% c(2, 9),
+                 c(FALSE, rep(TRUE, 8), FALSE))
+})
+
 test_that(".maxNa", {
     expect_equal(icmsofa:::.maxNa(1:10), 10)
     expect_equal(icmsofa:::.maxNa(c(NA, 1, NA, NA, 2, NA, 1, NA, 3)), 3)

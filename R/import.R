@@ -25,55 +25,24 @@ importIcm <- function(file,
 
     tbl$Type <- .treatmentIdType(tbl$TreatmentId)
 
-    isDrug <- tbl$Type %in% c("DOP", "DOB", "NOR")
+    # We don't use dopamine!
+    isDrug <- tbl$Type %in% c("DOB", "NOR")
     tbl$Value[isDrug] <- tbl$Dose[isDrug]
+
+    isO2 <- tbl$Type == "O2INS" & !is.na(tbl$Type)
+    tbl$Value[isO2] <- .o2FlowRateToFiO2(tbl$Dose[isO2])
+
+    isFiO2 <- tbl$Type == "FIO2" & !is.na(tbl$Type)
+    tbl$Value[isFiO2] <- tbl$Value[isFiO2] / 100L
 
     tbl$Date <- .asPosixCt(tbl$Date)
     tbl$Begin <- .asPosixCt(tbl$Begin)
     tbl$End <- .asPosixCt(tbl$End)
 
-    .import(tbl, verbose)
-}
-
-#' Fix and Reorder ICM import
-#'
-#' @param tbl `data.frame`
-#' @param verbose `logical`, verbose output?
-#'
-#' @noRd
-.import <- function(tbl, verbose=interactive()) {
-    if (verbose) {
-        message("Drop entries with missing treatment types ...")
-    }
-    isNa <- is.na(tbl$Type)
-    tbl <- tbl[!isNa,, drop=FALSE]
-    if (verbose) {
-        message(sum(isNa), " entries removed because treatment type is missing.")
-    }
-    if (verbose) {
-        message("Inspect BGA values ...")
-    }
-    tbl <- .filterBga(tbl, keep="arterial", verbose=verbose)
-    if (verbose) {
-        message("Inspect PaO2 values ...")
-    }
-    isPaO2 <- tbl$Type == "PAO2" & !is.na(tbl$Type)
-    tbl$Value[isPaO2] <- .filterPaO2(tbl$Value[isPaO2], verbose=verbose)
-    if (verbose) {
-        message("Inspect FiO2 values ...")
-    }
-    isFiO2 <- tbl$Type == "FIO2" & !is.na(tbl$Type)
-    tbl$Value[isFiO2] <- ifelse(tbl$Value[isFiO2] > 20L, tbl$Value[isFiO2] / 100L, tbl$Value[isFiO2])
-    tbl$Value[isFiO2] <- .filterFiO2(tbl$Value[isFiO2], verbose=verbose)
-    if (verbose) {
-        message("Inspect (N)IBP values ...")
-    }
-    isBp <- grepl("^N?IBP$", tbl$Type)
-    tbl$Value[isBp] <- .filterIbp(tbl$Value[isBp], verbose=verbose)
-
     tbl <- tbl[order(tbl$CaseId, tbl$Date),]
     rownames(tbl) <- NULL
-    tbl
+
+    .filter(tbl, verbose)
 }
 
 #' Import timepoint data.

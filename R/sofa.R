@@ -23,14 +23,14 @@ addSofa <- function(x, na.rm=FALSE) {
     x$SubScore <- NA_integer_
 
     ## easy scores
-    typeNa <- is.na(x$Type)
-    isBili <- x$Type == "BILI" & !typeNa
-    isPlt <- x$Type == "PLT" & !typeNa
-    isCrea <- x$Type == "CREA" & !typeNa
+    isBili <- x$Type == "BILI" & x$Valid
+    isPlt <- x$Type == "PLT" & x$Valid
+    isCrea <- x$Type == "CREA" & x$Valid
     x$SubScore[isBili] <- .bilirubin2sofa(x$Value[isBili])
     x$SubScore[isPlt] <- .platelets2sofa(x$Value[isPlt])
     x$SubScore[isCrea] <- .creatinine2sofa(x$Value[isCrea])
-    isCirc <- x$Type %in% c("DOB", "IBP", "NOR")
+
+    isCirc <- x$Type %in% c("DOP", "DOB", "IBP", "NOR") & x$Valid
     x$SubScore[isCirc] <- .circulation2sofa(x$Value[isCirc], x$Type[isCirc])
 
     ## complicated scores

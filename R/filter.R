@@ -1,61 +1,49 @@
-#' Filter PAO2 values
+#' Filter icm import
 #'
-#' Replace invalid PAO2 values with `NA`
-#'
-#' @param x `double`, PAO2 values
-#' @param range `double, allowed PAO2 range
+#' @param tbl `data.frame`, icm data
 #' @param verbose `logical`, verbose output?
-#' @return `double`
+#' @return `data.frame`
 #' @noRd
-.filterPaO2 <- function(x, range=c(10, 600), verbose=interactive()) {
-    .filterRange(x, range, verbose)
-}
-
-#' Filter FIO2 values
-#'
-#' Replace invalid FIO2 values with `NA`
-#'
-#' @param x `double`, FIO2 values
-#' @param range `double, allowed FIO2 range
-#' @param verbose `logical`, verbose output?
-#' @return `double`
-#' @noRd
-.filterFiO2 <- function(x, range=c(0.21, 1.0), verbose=interactive()) {
-    .filterRange(x, range, verbose)
-}
-
-#' Filter IBP values
-#'
-#' Replace invalid IBP values with `NA`
-#'
-#' @param x `double`, IPB values
-#' @param range `double, allowed IBP range
-#' @param verbose `logical`, verbose output?
-#' @return `double`
-#' @noRd
-.filterIbp <- function(x, range=c(20, 150), verbose=interactive()) {
-    .filterRange(x, range, verbose)
-}
-
-#' Filter by range
-#'
-#' @param x `numeric`
-#' @param range `numeric`, allowed range
-#' @param verbose `logical`, verbose output?
-#' @return `numeric`
-#' @noRd
-.filterRange <- function(x, range, verbose=interactive()) {
-    stopifnot(is.numeric(x))
-    stopifnot(is.numeric(range) && length(range) == 2L)
-    isOOR <- x < range[1L] | x > range[2L] | is.na(x)
-    if (verbose && any(isOOR)) {
+.filter <- function(tbl, verbose=interactive()) {
+    isNa <- is.na(tbl$Type)
+    tbl$Valid <- !isNa
+    if (verbose) {
         message(
-            sum(isOOR), " values removed because they are ",
-            "out of range [", range[1L], ";", range[2L], "]."
+            sum(isNa),
+            " entries removed because their treatment type is missing/unkown."
         )
     }
-    x[isOOR] <- NA_real_
-    x
+    if (verbose) {
+        message("Inspect BGA values ...")
+    }
+    tbl <- .filterBga(tbl, keep="arterial", verbose=verbose)
+
+    flt <- data.frame(
+        type=c("PAO2", "FIO2", "O2INS", "N?IBP"),
+        lower=c(10, 0.21, 0, 20),
+        upper=c(600, 1.0, 15, 150),
+        stringsAsFactors=FALSE
+    )
+
+    for (i in seq_len(nrow(flt))) {
+        if (verbose) {
+            message("Inspect ", flt$type[i], " values ...")
+        }
+
+        isType <- grepl(paste0("^", flt$type[i], "$"), tbl$Type)
+        tbl$Valid[isType] <-
+            tbl$Value[isType] %inrange% c(flt$lower[i], flt$upper[i]) &
+            !is.na(tbl$Value[isType])
+
+        if (verbose) {
+            message(
+                sum(!tbl$Valid[isType]), " ", flt$type[i],
+                " removed, because they are not in range ",
+                "[", flt$lower[i], ";", flt$upper[i], "].")
+        }
+
+    }
+    tbl
 }
 
 #' Keep just art/ven BGA
@@ -78,6 +66,6 @@
             paste(keep, collapse=" or "), "."
         )
     }
-    x$Value[toRemove] <- NA_real_
+    x$Valid <- x$Valid & !toRemove
     x
 }
