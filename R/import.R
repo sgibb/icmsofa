@@ -4,6 +4,8 @@
 #'
 #' @param file `character`, filename
 #' @param columns `character`, column names
+#' @param sep `character`, field separator
+#' @param dec `character`, decimal sign
 #' @param verbose `logical`, verbose output?
 #' @return data.frame
 #' @export
@@ -25,14 +27,16 @@ importIcm <- function(file,
 
     tbl$Type <- .treatmentIdType(tbl$TreatmentId)
 
+    tbl <- .filter(tbl, verbose)
+
     # We don't use dopamine!
     isDrug <- tbl$Type %in% c("DOB", "NOR")
     tbl$Value[isDrug] <- tbl$Dose[isDrug]
 
-    isO2 <- tbl$Type == "O2INS" & !is.na(tbl$Type)
+    isO2 <- tbl$Type == "O2INS" & tbl$Valid
     tbl$Value[isO2] <- .o2FlowRateToFiO2(tbl$Dose[isO2])
 
-    isFiO2 <- tbl$Type == "FIO2" & !is.na(tbl$Type)
+    isFiO2 <- tbl$Type == "FIO2" & tbl$Valid
     tbl$Value[isFiO2] <- tbl$Value[isFiO2] / 100L
 
     tbl$Date <- .asPosixCt(tbl$Date)
@@ -42,7 +46,8 @@ importIcm <- function(file,
     tbl <- tbl[order(tbl$CaseId, tbl$Date),]
     rownames(tbl) <- NULL
 
-    .filter(tbl, verbose)
+    tbl <- .correctFiO2Times(tbl, threshold=3600)
+    tbl
 }
 
 #' Import timepoint data.

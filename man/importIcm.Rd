@@ -14,6 +14,10 @@ importIcm(file, columns = c(CaseId = "HIS_CASEID", Date = "ADMINDATE",
 
 \item{columns}{\code{character}, column names}
 
+\item{sep}{\code{character}, field separator}
+
+\item{dec}{\code{character}, decimal sign}
+
 \item{verbose}{\code{logical}, verbose output?}
 }
 \value{
