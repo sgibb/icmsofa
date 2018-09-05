@@ -13,6 +13,14 @@
             " entries removed because their treatment type is missing/unkown."
         )
     }
+    isNa <- is.na(tbl$Value)
+    tbl$Valid <- tbl$Valid & !isNa
+    if (verbose) {
+        message(
+            sum(isNa),
+            " entries removed because their value is missing/unkown."
+        )
+    }
     if (verbose) {
         message("Inspect BGA values ...")
     }
@@ -20,8 +28,9 @@
 
     flt <- data.frame(
         type=c("PAO2", "FIO2", "O2INS", "N?IBP"),
-        lower=c(10, 0.21, 0, 20),
-        upper=c(600, 1.0, 15, 150),
+        value=c("Value", "Value", "Dose", "Value"),
+        lower=c(10, 21, 0, 20),
+        upper=c(600, 100, 15, 150),
         stringsAsFactors=FALSE
     )
 
@@ -32,8 +41,8 @@
 
         isType <- grepl(paste0("^", flt$type[i], "$"), tbl$Type)
         tbl$Valid[isType] <-
-            tbl$Value[isType] %inrange% c(flt$lower[i], flt$upper[i]) &
-            !is.na(tbl$Value[isType])
+            tbl[isType, flt$value[i]] %range% c(flt$lower[i], flt$upper[i]) &
+            !is.na(tbl[isType, flt$value[i]])
 
         if (verbose) {
             message(
@@ -57,9 +66,9 @@
                        verbose=interactive()) {
     keep <- match.arg(keep, several.ok=TRUE)
     mapping <- c(arterial=1L, venous=2L, misc=9L)
-    isBga <- x$Type == "BGA" & !is.na(x$Type)
+    isBga <- x$Type == "BGA" & x$Valid
     d <- x$Date[isBga & !x$Value %in% mapping[keep]]
-    toRemove <- x$Type == "PAO2" & !is.na(x$Type) & x$Date %in% d
+    toRemove <- x$Type == "PAO2" & x$Valid & x$Date %in% d
     if (verbose && any(toRemove)) {
         message(
             sum(toRemove), " paO2 values removed because they are not ",
