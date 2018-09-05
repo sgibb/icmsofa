@@ -138,8 +138,10 @@
         "4397", "paO2 LA", "PAO2",
         "5686", "PO2(art_kap) (Temp.) (mmHg) LA", "PAO2",
         # BGA
+        "2766", "BGA Quelle", "BGA",
         "2796", "BGA (Quelle)", "BGA",
-        "3676", "BGA (Quelle)", "BGA",
+        "3676", "BGA (Quelle) LA", "BGA",
+        "3730", "BGA (Quelle)", "BGA",
         # FIO2
         "675", "FiO2 (%) gemessen", "FIO2",
         "1995", "FiO2 (%)", "FIO2",
@@ -155,9 +157,6 @@
         # IBP
         "1646", "IBP m (mmHg)", "IBP",
         "1653", "NIBP m (mmHg)", "IBP",
-        # DOP
-        "277",  "Dopamin (500/50) Perf.", "DOP",
-        "3755", "Dopamin Perf", "DOP",
         # DOB
         "275", "Dobutamin (250/50) Perf.", "DOB",
         "4967", "Dobutamin (250/50) Perf.", "DOB",
