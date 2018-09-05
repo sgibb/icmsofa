@@ -48,19 +48,24 @@
 #' Is value in range
 #'
 #' @param x `numeric`
-#' @param range `numeric`, allowed range
+#' @param lower `numeric`
+#' @param upper `numeric`
+#' @param includeBoundaries `logical`
 #' @return logical
 #' @noRd
-.inRange <- function(x, range) {
-    stopifnot(is.numeric(x))
-    stopifnot(is.numeric(range) && length(range) == 2L)
-    if (range[1L] > range[2L]) {
-        x >= range[2L] & x <= range[1L]
+.inRange <- function(x, lower, upper, includeBoundaries=TRUE) {
+    if (includeBoundaries) {
+        lower <= x & x <= upper
     } else {
-        x >= range[1L] & x <= range[2L]
+        lower < x & x < upper
     }
 }
-"%inrange%" <- function(x, range) .inRange(x, range)
+"%range%" <-
+    function(x, range) .inRange(x, range[[1L]], range[[2L]],
+                                includeBoundaries=TRUE)
+"%inside%" <-
+    function(x, range) .inRange(x, range[[1L]], range[[2L]],
+                                includeBoundaries=FALSE)
 
 #' Calculate maximum
 #'

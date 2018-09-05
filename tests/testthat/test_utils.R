@@ -36,15 +36,15 @@ test_that(".inRange", {
     expect_error(icmsofa:::.inRange(1:10))
     expect_error(icmsofa:::.inRange(1:10, range="A"))
     expect_error(icmsofa:::.inRange(1:10, range=1.0))
-    expect_equal(icmsofa:::.inRange(1:10, c(2, 9)),
+    expect_equal(icmsofa:::.inRange(1:10, 2, 9),
                  c(FALSE, rep(TRUE, 8), FALSE))
-    expect_equal(icmsofa:::.inRange(1:10, c(9, 2)),
-                 c(FALSE, rep(TRUE, 8), FALSE))
-    expect_equal(icmsofa:::.inRange(c(NA, 1:10), c(2, 9)),
+    expect_equal(icmsofa:::.inRange(c(NA, 1:10), 2, 9),
                  c(NA, FALSE, rep(TRUE, 8), FALSE))
 
-    expect_equal(1:10 %inrange% c(2, 9),
+    expect_equal(1:10 %range% c(2, 9),
                  c(FALSE, rep(TRUE, 8), FALSE))
+    expect_equal(1:10 %inside% c(2, 9),
+                 c(FALSE, FALSE, rep(TRUE, 6), FALSE, FALSE))
 })
 
 test_that(".maxNa", {
