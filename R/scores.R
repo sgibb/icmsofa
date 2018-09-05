@@ -1,3 +1,7 @@
+#' names for subscores
+#' @noRd
+.sofaItems <- c("RESP", "CIRC", "BILI", "PLT", "CREA")
+
 #' Horovitz to SOFA
 #'
 #' < 400 	    1
