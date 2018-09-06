@@ -1,14 +1,37 @@
-#' Add SOFA scores.
-#'
 #' Add SOFA scores to `data.frame`
+#'
+#' @param x `data.frame`
+#' @param lag `numeric`, lag seconds added to reference date and extend the
+#' range to 24 h + lag seconds (e.g. laboratory values take some time)
+#' @param na.rm `logical`, should missing values replaced by zero?
+#' @return `data.frame`
+#' @export
+addSofa <- function(x, lag=0L, na.rm=FALSE) {
+    x <- .addSubScores(x)
+    x <- .addSofaScores(x, lag=lag, na.rm=na.rm)
+    x
+}
+
+#' Add SOFA-scores.
+#'
+#' Add the sofa-scores to the data.frame.
 #'
 #' @param x `data.frame`
 #' @param na.rm `logical`, should missing values replaced by zero?
 #' @return `data.frame`
-#' @export
-addSofa <- function(x, na.rm=FALSE) {
-    x <- .addSubScores(x)
-    x <- .addSofaScores(x, na.rm=na.rm)
+#' @noRd
+.addSofaScores <- function(x, na.rm=FALSE) {
+    x <- x[order(x$CaseId, x$Date), ]
+
+    x$SOFA <- ifelse(na.rm, 0L, NA_integer_)
+
+    x <- do.call(
+        "rbind",
+        lapply(split(x, x$CaseId), .calculateSofa, na.rm=na.rm)
+    )
+
+    ## remove useless rownames
+    rownames(x) <- NULL
     x
 }
 
