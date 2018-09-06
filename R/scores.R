@@ -14,7 +14,9 @@
 #' @return integer, 0:4
 #' @noRd
 .horovitz2sofa <- function(x, ventilation=TRUE) {
-    (x < 400) + (x < 300) + ventilation * ((x < 200) + (x < 100))
+    as.integer(
+        (x < 400L) + (x < 300L) + ventilation * ((x < 200L) + (x < 100L))
+    )
 }
 
 #' Circulation to SOFA
@@ -31,9 +33,11 @@
 #' @return integer 0:4
 #' @noRd
 .circulation2sofa <- function(x, type) {
-    ((type == "IBP") * (x < 70L)) +
-    ((type == "DOB") * 2L) +
-    ((type == "NOR") * ((x > 0.1) + 3L))
+    as.integer(
+        ((type == "IBP") * (x < 70L)) +
+        ((type == "DOB") * 2L) +
+        ((type == "NOR") * ((x > 0.1) + 3L))
+    )
 }
 
 #' Bilirubin to SOFA

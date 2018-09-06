@@ -136,18 +136,30 @@ addSofa <- function(x, na.rm=FALSE) {
 #'
 #' @param x `data.frame`
 #' @param na.rm `logical`, should missing values replaced by zero?
+#' @param lag `numeric`, lag seconds added to reference date and extend the
+#' range to 24 h + lag seconds (e.g. laboratory values take some time)
 #' @return `data.frame`
 #' @noRd
-.calculateSofa <- function(x, na.rm=FALSE) {
+.calculateSofa <- function(x, lag=0L, na.rm=FALSE) {
     for (i in seq_len(nrow(x))) {
-        sel <- .prev24h(x$Date, ref=x$Date[i])
+        sellag <- .prev24h(x$Date, ref=x$Date[i], lag=lag)
+
+        if (lag) {
+            sel <- .prev24h(x$Date, ref=x$Date[i])
+        } else {
+            sel <- sellag
+        }
         if (any(sel)) {
-            sb <- x[sel, , drop=FALSE]
-            x$Sofa[i] <-
+            x$SOFA[i] <-
                 sum(
                     vapply(
-                        1L:5L,
-                        function(ti).maxNa(sb$SubScore[sb$TypeId == ti]),
+                        c("RESP", "CIRC"),
+                        function(it)as.integer(.maxNa(x[sel, it])),
+                        NA_integer_
+                    ),
+                    vapply(
+                        c("BILI", "PLT", "CREA"),
+                        function(it)as.integer(.maxNa(x[sellag, it])),
                         NA_integer_
                     ),
                     na.rm=na.rm
