@@ -2,12 +2,15 @@
 % Please edit documentation in R/sofa.R
 \name{addSofa}
 \alias{addSofa}
-\title{Add SOFA scores.}
+\title{Add SOFA scores to \code{data.frame}}
 \usage{
-addSofa(x, na.rm = FALSE)
+addSofa(x, lag = 0L, na.rm = FALSE)
 }
 \arguments{
 \item{x}{\code{data.frame}}
+
+\item{lag}{\code{numeric}, lag seconds added to reference date and extend the
+range to 24 h + lag seconds (e.g. laboratory values take some time)}
 
 \item{na.rm}{\code{logical}, should missing values replaced by zero?}
 }
