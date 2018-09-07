@@ -61,12 +61,12 @@ plotSofa <- function(x, path, timepoints=NULL) {
         side=c(2L, 2L, 2L, 4L),
         stringsAsFactors=FALSE
     )
-    .plotSubScores(x, d, timepoints)
+    .plotSubScores(x, d, timepoints, type="RESP")
 
     d <- data.frame(
-        nms=c("IBP", "DOB", "NOR", "SOFA"),
+        nms=c("MAP", "DOB", "NOR", "SOFA"),
         lnms=c("Mean (Non)-Invasive Blood Pressure [mmHg]",
-               "Dobutamine [\u00B5g/kg/min]",
+              "Dobutamine [\u00B5g/kg/min]",
                "Norepinephrine [\u00B5g/kg/min]", "SOFA Subscore"),
         col=c("#E31A1C", "#6A3D9A", "#CAB2D6", "#B15928"),
         pch=c(20, 20, 20, 15),
@@ -75,7 +75,7 @@ plotSofa <- function(x, path, timepoints=NULL) {
         side=c(2L, 2L, 2L, 4L),
         stringsAsFactors=FALSE
     )
-    .plotSubScores(x, d, timepoints)
+    .plotSubScores(x, d, timepoints, type="CIRC")
 
     d <- data.frame(
         nms=c("BILI", "SOFA"),
@@ -87,7 +87,7 @@ plotSofa <- function(x, path, timepoints=NULL) {
         side=c(2L, 4L),
         stringsAsFactors=FALSE
     )
-    .plotSubScores(x, d, timepoints)
+    .plotSubScores(x, d, timepoints, type="BILI")
 
     d <- data.frame(
         nms=c("PLT", "SOFA"),
@@ -99,7 +99,7 @@ plotSofa <- function(x, path, timepoints=NULL) {
         side=c(2L, 4L),
         stringsAsFactors=FALSE
     )
-    .plotSubScores(x, d, timepoints)
+    .plotSubScores(x, d, timepoints, type="PLT")
 
     d <- data.frame(
         nms=c("CREA", "SOFA"),
@@ -111,7 +111,7 @@ plotSofa <- function(x, path, timepoints=NULL) {
         side=c(2L, 4L),
         stringsAsFactors=FALSE
     )
-    .plotSubScores(x, d, timepoints)
+    .plotSubScores(x, d, timepoints, type="CREA")
 
     par(mar=c(7L, 9L, 0L, 3L))
     .plotSofaScores(x, timepoints)
@@ -122,8 +122,9 @@ plotSofa <- function(x, path, timepoints=NULL) {
 #' @param x `data.frame`
 #' @param d `data.frame`, with names, position, colors etc.
 #' @param timepoints `double`, named timepoints
+#' @param type `character`, SOFA sub score
 #' @noRd
-.plotSubScores <- function(x, d, timepoints=NULL) {
+.plotSubScores <- function(x, d, timepoints=NULL, type) {
     y <- seq(0, 1, by=0.2)
     iSofa <- nrow(d)
 
@@ -155,13 +156,13 @@ plotSofa <- function(x, path, timepoints=NULL) {
 
         points(
             x$Date[x$Type == d$nms[i]],
-            x$SubScore[x$Type == d$nms[i]] / d$scl[iSofa],
+            x[x$Type == d$nms[i], type] / d$scl[iSofa],
             col=d$col[iSofa], type="s", lwd=1.2
         )
 
         points(
             x$Date[x$Type == d$nms[i]],
-            x$SubScore[x$Type == d$nms[i]] / d$scl[iSofa],
+            x[x$Type == d$nms[i], type] / d$scl[iSofa],
             col=d$col[iSofa], type="p", pch=d$pch[iSofa], cex=1.2
         )
 
@@ -228,8 +229,8 @@ plotSofa <- function(x, path, timepoints=NULL) {
         srt=60, adj=c(1.1, 0.5), xpd=TRUE
     )
 
-    points(x$Date, x$Sofa, type="s", lwd=1.2, col="#B15928")
-    points(x$Date, x$Sofa, type="p", pch=20L, cex=1.2, col="#B15928")
+    points(x$Date, x$SOFA, type="s", lwd=1.2, col="#B15928")
+    points(x$Date, x$SOFA, type="p", pch=20L, cex=1.2, col="#B15928")
     axis(side=2L, at=y2, labels=FALSE, line=0L, col="#B15928")
     axis(side=4L, at=y2, labels=FALSE, line=0L, col="#B15928")
     mtext(side=2L, at=y2, text=y2, col="#B15928", line=1L, cex=0.5)
