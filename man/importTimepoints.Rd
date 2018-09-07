@@ -4,10 +4,14 @@
 \alias{importTimepoints}
 \title{Import timepoint data.}
 \usage{
-importTimepoints(file)
+importTimepoints(file, sep = "\\t", dec = ",")
 }
 \arguments{
 \item{file}{\code{character}, filename}
+
+\item{sep}{\code{character}, field separator}
+
+\item{dec}{\code{character}, decimal sign}
 }
 \value{
 data.frame

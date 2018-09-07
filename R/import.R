@@ -52,13 +52,17 @@ importIcm <- function(file,
 
 #' Import timepoint data.
 #'
-#' Import timepoint data.
-#'
 #' @param file `character`, filename
+#' @param sep `character`, field separator
+#' @param dec `character`, decimal sign
 #' @return data.frame
 #' @export
-importTimepoints <- function(file) {
-    tbl <- read_excel(file)
+importTimepoints <- function(file, sep="\t", dec=",") {
+    tbl <- read.table(
+        file,
+        dec=dec, sep=sep, header=TRUE,
+        stringsAsFactors=FALSE
+    )
     tbl[-1L] <- lapply(tbl[-1L], .asPosixCt)
-    as.data.frame(tbl, stringsAsFactors=FALSE)
+    tbl
 }
