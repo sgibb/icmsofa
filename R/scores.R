@@ -29,12 +29,12 @@
 #' dopamine > 15 µg/kg/min OR epinephrine > 0.1 µg/kg/min OR norepinephrine > 0.1 µg/kg/min = 4
 #'
 #' @param x double, value
-#' @param type IBP/DOB/NOR
+#' @param type MAP/DOB/NOR
 #' @return integer 0:4
 #' @noRd
 .circulation2sofa <- function(x, type) {
     as.integer(
-        ((type == "IBP") * (x < 70L)) +
+        ((type == "MAP") * (x < 70L)) +
         ((type == "DOB") * 2L) +
         ((type == "NOR") * ((x > 0.1) + 3L))
     )

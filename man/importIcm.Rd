@@ -5,9 +5,9 @@
 \title{Import ICM data}
 \usage{
 importIcm(file, columns = c(CaseId = "HIS_CASEID", Date = "ADMINDATE",
-  TreatmentId = "TREATMENTID", Description = "TREATMENTNAME", Value =
-  "NUMVALUE", Dose = "DOSE", Begin = "BEGIN", End = "END"), sep = "\\t",
-  dec = ",", verbose = interactive())
+  TreatmentId = "TREATMENTID", Description = "TREATMENTNAME", Type =
+  "TREATMENTTYPE", Value = "NUMVALUE", Dose = "DOSE", Begin = "BEGIN", End
+  = "END"), sep = "\\t", dec = ",", verbose = interactive())
 }
 \arguments{
 \item{file}{\code{character}, filename}

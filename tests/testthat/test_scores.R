@@ -13,7 +13,7 @@ test_that(".horovitz2sofa", {
 test_that(".circulation2sofa", {
     expect_equal(icmsofa:::.circulation2sofa(
                     c(70, 69, NA, 1, 0.01, 0.1, 0.2),
-                    c("IBP", "IBP", "DOB", "DOB", "NOR", "NOR", "NOR")),
+                    c("MAP", "MAP", "DOB", "DOB", "NOR", "NOR", "NOR")),
                  as.integer(c(0, 1, NA, 2, 3, 3, 4)))
 })
 

@@ -27,7 +27,7 @@
     tbl <- .filterBga(tbl, keep="arterial", verbose=verbose)
 
     flt <- data.frame(
-        type=c("PAO2", "FIO2", "O2INS", "N?IBP"),
+        type=c("PAO2", "FIO2", "O2INS", "MAP"),
         value=c("Value", "Value", "Dose", "Value"),
         lower=c(10, 21, 0, 20),
         upper=c(600, 100, 15, 150),

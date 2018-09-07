@@ -122,7 +122,7 @@ addSofa <- function(x, lag=0L, na.rm=FALSE) {
     x <- x[order(x$CaseId, x$Date), ]
 
     ## the easy ones (score for each timestamp)
-    isCirc <- x$Type %in% c("IBP", "DOB", "NOR") & x$Valid
+    isCirc <- x$Type %in% c("MAP", "DOB", "NOR") & x$Valid
     x$CIRC[isCirc] <- .circulation2sofa(x$Value[isCirc], x$Type[isCirc])
 
     ## the perfusor values spanning some longer time ranges

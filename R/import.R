@@ -13,6 +13,7 @@ importIcm <- function(file,
                       columns=c(CaseId="HIS_CASEID", Date="ADMINDATE",
                                 TreatmentId="TREATMENTID",
                                 Description="TREATMENTNAME",
+                                Type="TREATMENTTYPE",
                                 Value="NUMVALUE", Dose="DOSE",
                                 Begin="BEGIN", End="END"),
                       sep="\t", dec=",",
@@ -24,8 +25,6 @@ importIcm <- function(file,
     )
     tbl <- tbl[, columns, drop=FALSE]
     colnames(tbl) <- names(columns)
-
-    tbl$Type <- .treatmentIdType(tbl$TreatmentId)
 
     tbl <- .filter(tbl, verbose)
 
