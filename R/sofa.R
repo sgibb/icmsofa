@@ -17,17 +17,19 @@ addSofa <- function(x, lag=0L, na.rm=FALSE) {
 #' Add the sofa-scores to the data.frame.
 #'
 #' @param x `data.frame`
+#' @param lag `numeric`, lag seconds added to reference date and extend the
+#' range to 24 h + lag seconds (e.g. laboratory values take some time)
 #' @param na.rm `logical`, should missing values replaced by zero?
 #' @return `data.frame`
 #' @noRd
-.addSofaScores <- function(x, na.rm=FALSE) {
+.addSofaScores <- function(x, lag=0L, na.rm=FALSE) {
     x <- x[order(x$CaseId, x$Date), ]
 
     x$SOFA <- ifelse(na.rm, 0L, NA_integer_)
 
     x <- do.call(
         "rbind",
-        lapply(split(x, x$CaseId), .calculateSofa, na.rm=na.rm)
+        lapply(split(x, x$CaseId), .calculateSofa, lag=lag, na.rm=na.rm)
     )
 
     ## remove useless rownames
@@ -169,24 +171,39 @@ addSofa <- function(x, lag=0L, na.rm=FALSE) {
 
         if (lag) {
             sel <- .prev24h(x$Date, ref=x$Date[i])
+
+            if (any(sel)) {
+                sb <- x[sel,, drop=FALSE]
+                sblag <- x[sellag,, drop=FALSE]
+
+                x$SOFA[i] <-
+                    sum(
+                        vapply(
+                            c("RESP", "CIRC"),
+                            function(it)as.integer(.maxNa(sb[, it])),
+                            NA_integer_
+                        ),
+                        vapply(
+                            c("BILI", "PLT", "CREA"),
+                            function(it)as.integer(.maxNa(sblag[, it])),
+                            NA_integer_
+                        ),
+                        na.rm=na.rm
+                    )
+            }
         } else {
-            sel <- sellag
-        }
-        if (any(sel)) {
-            x$SOFA[i] <-
-                sum(
-                    vapply(
-                        c("RESP", "CIRC"),
-                        function(it)as.integer(.maxNa(x[sel, it])),
-                        NA_integer_
-                    ),
-                    vapply(
-                        c("BILI", "PLT", "CREA"),
-                        function(it)as.integer(.maxNa(x[sellag, it])),
-                        NA_integer_
+            if (any(sellag)) {
+                sb <- x[sel,, drop=FALSE]
+                x$SOFA[i] <-
+                    sum(
+                        vapply(
+                            .sofaItems,
+                            function(it)as.integer(.maxNa(sb[, it])),
+                            NA_integer_
                     ),
                     na.rm=na.rm
                 )
+            }
         }
     }
     x
