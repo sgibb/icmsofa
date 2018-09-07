@@ -99,7 +99,7 @@
     stopifnot(is.numeric(lag))
     x <- as.numeric(x)
     ref <- as.numeric(ref)
-    x %inrange% c(ref - 24L * 3600, ref + lag)
+    x %range% c(ref - 24L * 3600, ref + lag)
 }
 
 #' SOFA id
