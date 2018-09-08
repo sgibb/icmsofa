@@ -42,7 +42,7 @@
         isType <- grepl(paste0("^", flt$type[i], "$"), tbl$Type)
         tbl$Valid[isType] <-
             tbl[isType, flt$value[i]] %range% c(flt$lower[i], flt$upper[i]) &
-            !is.na(tbl[isType, flt$value[i]])
+            !is.na(tbl[isType, flt$value[i]]) & tbl$Valid[isType]
 
         if (verbose) {
             message(
@@ -65,9 +65,10 @@
 .filterBga <- function(x, keep=c("arterial", "venous", "misc"),
                        verbose=interactive()) {
     keep <- match.arg(keep, several.ok=TRUE)
-    mapping <- c(arterial=1L, venous=2L, misc=9L)
+    mapping <- c(arterial=1L, venous=2L, misc=999L)
     isBga <- x$Type == "BGA" & x$Valid
-    d <- x$Date[isBga & !x$Value %in% mapping[keep]]
+    toRemoveBga <- isBga & !(x$Value %in% mapping[keep])
+    d <- unique(x$Date[toRemoveBga])
     toRemove <- x$Type == "PAO2" & x$Valid & x$Date %in% d
     if (verbose && any(toRemove)) {
         message(
@@ -75,6 +76,6 @@
             paste(keep, collapse=" or "), "."
         )
     }
-    x$Valid <- x$Valid & !toRemove
+    x$Valid[toRemoveBga | toRemove] <- FALSE
     x
 }
