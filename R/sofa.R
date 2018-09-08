@@ -167,44 +167,53 @@ addSofa <- function(x, lag=0L, na.rm=FALSE) {
 #' @noRd
 .calculateSofa <- function(x, lag=0L, na.rm=FALSE) {
     for (i in seq_len(nrow(x))) {
-        sellag <- .prev24h(x$Date, ref=x$Date[i], lag=lag)
+        x$SOFA[i] <- .sofaAt(x, x$Date[i], lag=lag, na.rm=na.rm)
+    }
+    x
+}
 
-        if (lag) {
-            sel <- .prev24h(x$Date, ref=x$Date[i])
+#' SOFA score at timepoint
+#'
+#' @param x `data.frame`
+#' @param tp `POSIXct`, timepoint
+#' @param na.rm `logical`, should missing values replaced by zero?
+#' @param lag `numeric`, lag seconds added to reference date and extend the
+#' range to 24 h + lag seconds (e.g. laboratory values take some time)
+#' @return `data.frame`
+#' @noRd
+.sofaAt <- function(x, tp, lag=0L, na.rm=FALSE) {
+    scores <- rep.int(NA_integer_, 6L)
+    names(scores) <- c(.sofaItems, "SOFA")
+    items <- .sofaItems
 
-            if (any(sel)) {
-                sb <- x[sel,, drop=FALSE]
-                sblag <- x[sellag,, drop=FALSE]
+    if (lag) {
+        sellag <- .prev24h(x$Date, ref=tp, lag=lag)
+        sel <- .prev24h(x$Date, ref=tp)
 
-                x$SOFA[i] <-
-                    sum(
-                        vapply(
-                            c("RESP", "CIRC"),
-                            function(it)as.integer(.maxNa(sb[, it])),
-                            NA_integer_
-                        ),
-                        vapply(
-                            c("BILI", "PLT", "CREA"),
-                            function(it)as.integer(.maxNa(sblag[, it])),
-                            NA_integer_
-                        ),
-                        na.rm=na.rm
-                    )
+        if (isTRUE(any(sel))) {
+            sb <- x[sellag,, drop=FALSE]
+
+            for (item in c("BILI", "PLT", "CREA")) {
+                scores[item] <- as.integer(.maxNa(sb[, item]))
             }
-        } else {
-            if (any(sellag)) {
-                sb <- x[sel,, drop=FALSE]
-                x$SOFA[i] <-
-                    sum(
-                        vapply(
-                            .sofaItems,
-                            function(it)as.integer(.maxNa(sb[, it])),
-                            NA_integer_
-                    ),
-                    na.rm=na.rm
-                )
+
+            sb <- x[sel,, drop=FALSE]
+
+            for (item in c("RESP", "CIRC")) {
+                scores[item] <- as.integer(.maxNa(sb[, item]))
+            }
+        }
+    } else {
+        sel <- .prev24h(x$Date, ref=tp)
+
+        if (isTRUE(any(sel))) {
+            sb <- x[sel,, drop=FALSE]
+
+            for (item in .sofaItems) {
+                scores[item] <- as.integer(.maxNa(sb[, item]))
             }
         }
     }
-    x
+    scores["SOFA"] <- sum(scores[.sofaItems])
+    scores
 }

@@ -26,6 +26,10 @@ importIcm <- function(file,
     tbl <- tbl[, columns, drop=FALSE]
     colnames(tbl) <- names(columns)
 
+    tbl$Date <- .asPosixCt(tbl$Date)
+    tbl$Begin <- .asPosixCt(tbl$Begin)
+    tbl$End <- .asPosixCt(tbl$End)
+
     tbl <- .filter(tbl, verbose)
 
     # We don't use dopamine!
@@ -37,10 +41,6 @@ importIcm <- function(file,
 
     isFiO2 <- tbl$Type == "FIO2" & tbl$Valid
     tbl$Value[isFiO2] <- tbl$Value[isFiO2] / 100L
-
-    tbl$Date <- .asPosixCt(tbl$Date)
-    tbl$Begin <- .asPosixCt(tbl$Begin)
-    tbl$End <- .asPosixCt(tbl$End)
 
     tbl <- tbl[order(tbl$CaseId, tbl$Date),]
     rownames(tbl) <- NULL
@@ -54,14 +54,21 @@ importIcm <- function(file,
 #' @param file `character`, filename
 #' @param sep `character`, field separator
 #' @param dec `character`, decimal sign
+#' @param nonTimeColumns `numeric`, columns without time information
+#' @param format `character`, time format
 #' @return data.frame
 #' @export
-importTimepoints <- function(file, sep="\t", dec=",") {
+importTimepoints <- function(file, sep="\t", dec=",", nonTimeColumns=1L,
+                             format="%d.%m.%Y %H:%M") {
     tbl <- read.table(
         file,
         dec=dec, sep=sep, header=TRUE,
         stringsAsFactors=FALSE
     )
-    tbl[-1L] <- lapply(tbl[-1L], .asPosixCt)
+    tbl[-nonTimeColumns] <- lapply(
+        tbl[-nonTimeColumns],
+        .asPosixCt,
+        format=format
+    )
     tbl
 }
