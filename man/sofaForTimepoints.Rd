@@ -4,13 +4,16 @@
 \alias{sofaForTimepoints}
 \title{Get SOFA for specific timepoint}
 \usage{
-sofaForTimepoints(icm, tp)
+sofaForTimepoints(icm, tp, lag = 0L)
 }
 \arguments{
 \item{icm}{\code{data.frame}, ICM data}
 
 \item{tp}{\code{data.frme}, timepoint data, first column Id, other columns
 timepoints}
+
+\item{lag}{\code{numeric}, lag seconds added to reference date and extend the
+range to 24 h + lag seconds (e.g. laboratory values take some time)}
 }
 \value{
 \code{data.frame}

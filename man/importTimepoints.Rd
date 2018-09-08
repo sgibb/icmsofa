@@ -4,7 +4,8 @@
 \alias{importTimepoints}
 \title{Import timepoint data.}
 \usage{
-importTimepoints(file, sep = "\\t", dec = ",")
+importTimepoints(file, sep = "\\t", dec = ",", nonTimeColumns = 1L,
+  format = "\%d.\%m.\%Y \%H:\%M")
 }
 \arguments{
 \item{file}{\code{character}, filename}
@@ -12,6 +13,10 @@ importTimepoints(file, sep = "\\t", dec = ",")
 \item{sep}{\code{character}, field separator}
 
 \item{dec}{\code{character}, decimal sign}
+
+\item{nonTimeColumns}{\code{numeric}, columns without time information}
+
+\item{format}{\code{character}, time format}
 }
 \value{
 data.frame
