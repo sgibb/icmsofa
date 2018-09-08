@@ -71,12 +71,3 @@ test_that(".prev24h", {
     expect_equal(icmsofa:::.prev24h(x, x[3], 60),
                  c(TRUE, TRUE, TRUE, TRUE, FALSE, FALSE))
 })
-
-test_that(".whichLastNotNa", {
-    expect_equal(icmsofa:::.whichLastNotNa(1:3), 3)
-    expect_equal(icmsofa:::.whichLastNotNa(c(1:3, NA)), 3)
-    expect_equal(icmsofa:::.whichLastNotNa(c(1, NA, 2)), 3)
-    expect_equal(icmsofa:::.whichLastNotNa(c(NA, 1:2)), 3)
-    expect_equal(icmsofa:::.whichLastNotNa(c(NA, NA)), NA_integer_)
-    expect_equal(icmsofa:::.whichLastNotNa(c()), NA_integer_)
-})

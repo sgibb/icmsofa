@@ -43,9 +43,9 @@ importIcm <- function(file,
     tbl$Value[isFiO2] <- tbl$Value[isFiO2] / 100L
 
     tbl <- tbl[order(tbl$CaseId, tbl$Date),]
-    rownames(tbl) <- NULL
 
     tbl <- .correctFiO2Times(tbl, threshold=3600)
+    rownames(tbl) <- NULL
     tbl
 }
 

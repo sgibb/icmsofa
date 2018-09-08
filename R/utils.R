@@ -101,11 +101,3 @@
     ref <- as.numeric(ref)
     x %range% c(ref - 24L * 3600, ref + lag)
 }
-
-#' Find index of last non-NA
-#'
-#' @param x `double`
-#' @return `double`
-.whichLastNotNa <- function(x) {
-    Position(function(y)!is.na(y), x, right=TRUE)
-}
