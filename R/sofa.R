@@ -106,6 +106,7 @@ addSofa <- function(x, lag=0L, na.rm=FALSE) {
     sb$RESP <- .horovitz2sofa(sb$Value, sb$FiO2Type != "O2INS")
     sb$Type <- "HORV"
     sb$Description <- "Horovitz"
+    sb <- unique(sb)
 
     x <- rbind(x, sb[, colnames(x), drop=FALSE])
     x <- x[order(x$CaseId, x$Date), ]
