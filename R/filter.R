@@ -72,7 +72,7 @@
     toRemove <- x$Type == "PAO2" & x$Valid & x$Date %in% d
     if (verbose && any(toRemove)) {
         message(
-            sum(toRemove), " paO2 values removed because they are not ",
+            sum(toRemove), " PAO2 values removed because they are not ",
             paste(keep, collapse=" or "), "."
         )
     }
