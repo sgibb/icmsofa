@@ -188,7 +188,7 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE) {
             x$Date[i],
             lag=lag,
             lagOnlyLaboratory=lagOnlyLaboratory,
-            na.rm=na.rm)
+            na.rm=na.rm)["SOFA"]
     }
     x
 }
