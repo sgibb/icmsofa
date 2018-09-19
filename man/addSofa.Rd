@@ -4,13 +4,16 @@
 \alias{addSofa}
 \title{Add SOFA scores to \code{data.frame}}
 \usage{
-addSofa(x, lag = 0L, na.rm = FALSE)
+addSofa(x, lag = 0L, lagOnlyLaboratory = TRUE, na.rm = FALSE)
 }
 \arguments{
 \item{x}{\code{data.frame}}
 
 \item{lag}{\code{numeric}, lag seconds added to reference date and extend the
 range to 24 h + lag seconds (e.g. laboratory values take some time)}
+
+\item{lagOnlyLaboratory}{\code{logical} add lag seconds only to the laboratory
+values?}
 
 \item{na.rm}{\code{logical}, should missing values replaced by zero?}
 }
