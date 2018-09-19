@@ -3,12 +3,18 @@
 #' @param x `data.frame`
 #' @param lag `numeric`, lag seconds added to reference date and extend the
 #' range to 24 h + lag seconds (e.g. laboratory values take some time)
+#' @param lagOnlyLaboratory `logical` add lag seconds only to the laboratory
+#' values?
 #' @param na.rm `logical`, should missing values replaced by zero?
 #' @return `data.frame`
 #' @export
-addSofa <- function(x, lag=0L, na.rm=FALSE) {
+addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE) {
     x <- .addSubScores(x)
-    x <- .addSofaScores(x, lag=lag, na.rm=na.rm)
+    x <- .addSofaScores(
+        x,
+        lag=lag,
+        lagOnlyLaboratory=lagOnlyLaboratory,
+        na.rm=na.rm)
     x
 }
 
@@ -19,17 +25,24 @@ addSofa <- function(x, lag=0L, na.rm=FALSE) {
 #' @param x `data.frame`
 #' @param lag `numeric`, lag seconds added to reference date and extend the
 #' range to 24 h + lag seconds (e.g. laboratory values take some time)
+#' @param lagOnlyLaboratory `logical` add lag seconds only to the laboratory
+#' values?
 #' @param na.rm `logical`, should missing values replaced by zero?
 #' @return `data.frame`
 #' @noRd
-.addSofaScores <- function(x, lag=0L, na.rm=FALSE) {
+.addSofaScores <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE) {
     x <- x[order(x$CaseId, x$Date), ]
 
     x$SOFA <- ifelse(na.rm, 0L, NA_integer_)
 
     x <- do.call(
         "rbind",
-        lapply(split(x, x$CaseId), .calculateSofa, lag=lag, na.rm=na.rm)
+        lapply(
+            split(x, x$CaseId),
+            .calculateSofa,
+            lag=lag,
+            lagOnlyLaboratory=lagOnlyLaboratory,
+            na.rm=na.rm)
     )
 
     ## remove useless rownames
@@ -161,14 +174,21 @@ addSofa <- function(x, lag=0L, na.rm=FALSE) {
 #' Calculate 24 h SOFA-Score.
 #'
 #' @param x `data.frame`
-#' @param na.rm `logical`, should missing values replaced by zero?
 #' @param lag `numeric`, lag seconds added to reference date and extend the
 #' range to 24 h + lag seconds (e.g. laboratory values take some time)
+#' @param lagOnlyLaboratory `logical` add lag seconds only to the laboratory
+#' values?
+#' @param na.rm `logical`, should missing values replaced by zero?
 #' @return `data.frame`
 #' @noRd
-.calculateSofa <- function(x, lag=0L, na.rm=FALSE) {
+.calculateSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE) {
     for (i in seq_len(nrow(x))) {
-        x$SOFA[i] <- .sofaAt(x, x$Date[i], lag=lag, na.rm=na.rm)
+        x$SOFA[i] <- .sofaAt(
+            x,
+            x$Date[i],
+            lag=lag,
+            lagOnlyLaboratory=lagOnlyLaboratory,
+            na.rm=na.rm)
     }
     x
 }
@@ -177,17 +197,19 @@ addSofa <- function(x, lag=0L, na.rm=FALSE) {
 #'
 #' @param x `data.frame`
 #' @param tp `POSIXct`, timepoint
-#' @param na.rm `logical`, should missing values replaced by zero?
 #' @param lag `numeric`, lag seconds added to reference date and extend the
 #' range to 24 h + lag seconds (e.g. laboratory values take some time)
+#' @param lagOnlyLaboratory `logical` add lag seconds only to the laboratory
+#' values?
+#' @param na.rm `logical`, should missing values replaced by zero?
 #' @return `data.frame`
 #' @noRd
-.sofaAt <- function(x, tp, lag=0L, na.rm=FALSE) {
+.sofaAt <- function(x, tp, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE) {
     scores <- rep.int(NA_integer_, 6L)
     names(scores) <- c(.sofaItems, "SOFA")
     items <- .sofaItems
 
-    if (lag) {
+    if (lagOnlyLaboratory) {
         sellag <- .prev24h(x$Date, ref=tp, lag=lag)
         sel <- .prev24h(x$Date, ref=tp)
 
@@ -205,7 +227,7 @@ addSofa <- function(x, lag=0L, na.rm=FALSE) {
             }
         }
     } else {
-        sel <- .prev24h(x$Date, ref=tp)
+        sel <- .prev24h(x$Date, ref=tp, lag=lag)
 
         if (isTRUE(any(sel))) {
             sb <- x[sel,, drop=FALSE]
