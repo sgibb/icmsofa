@@ -15,7 +15,7 @@ test_that(".filterBga", {
     r$Valid[5:6] <- FALSE
     expect_equal(icmsofa:::.filterBga(d, keep=c("a", "v")), r)
     expect_message(icmsofa:::.filterBga(d, keep=c("a", "v"), verbose=TRUE),
-                   "1 paO2 values removed")
+                   "1 PAO2 values removed")
     expect_silent(icmsofa:::.filterBga(d, keep=c("a", "v"), verbose=FALSE))
     r$Valid <- TRUE
     r$Valid[1:4] <- FALSE
