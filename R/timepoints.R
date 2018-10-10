@@ -39,3 +39,25 @@ sofaForTimepoints <- function(icm, tp, lag=0L, lagOnlyLaboratory=TRUE) {
     }
     cbind(tp, sofa)
 }
+
+#' Extract specific time range/frame.
+#'
+#' @param icm `data.frame`, ICM data
+#' @param tp `data.frme`, timepoint data, first column Id, second column
+#' timepoints
+#' @param lag `numeric`, lag seconds added to reference date and extend the
+#' range to 24 h + lag seconds (e.g. laboratory values take some time)
+#' @return `data.frame`
+#' @export
+extractTimeFrame <- function(icm, tp, lag=0L) {
+    icm <- icm[icm$CaseId %in% tp[, 1L],, drop=FALSE]
+    icm <- icm[order(icm$CaseId, icm$Date), ]
+    sel <- logical(nrow(icm))
+    for (i in seq_len(nrow(tp))) {
+        sel <- sel |
+            (icm$CaseId == tp[i, 1L] &
+             .prev24h(icm$Date, tp[i, 2L], lag) &
+             !is.na(tp[i, 2L]))
+    }
+    icm[sel,, drop=FALSE]
+}

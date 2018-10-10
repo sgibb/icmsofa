@@ -2,6 +2,7 @@
 
 export(addSofa)
 export(exportSofa)
+export(extractTimeFrame)
 export(importIcm)
 export(importTimepoints)
 export(plotSofa)
