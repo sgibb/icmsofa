@@ -4,7 +4,8 @@
 \alias{addSofa}
 \title{Add SOFA scores to \code{data.frame}}
 \usage{
-addSofa(x, lag = 0L, lagOnlyLaboratory = TRUE, na.rm = FALSE)
+addSofa(x, lag = 0L, lagOnlyLaboratory = TRUE, na.rm = FALSE,
+  verbose = interactive())
 }
 \arguments{
 \item{x}{\code{data.frame}}
@@ -16,6 +17,8 @@ range to 24 h + lag seconds (e.g. laboratory values take some time)}
 values?}
 
 \item{na.rm}{\code{logical}, should missing values replaced by zero?}
+
+\item{verbose}{\code{logical}, verbose output?}
 }
 \value{
 \code{data.frame}

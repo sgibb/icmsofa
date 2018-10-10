@@ -6,15 +6,18 @@
 #' @param lagOnlyLaboratory `logical` add lag seconds only to the laboratory
 #' values?
 #' @param na.rm `logical`, should missing values replaced by zero?
+#' @param verbose `logical`, verbose output?
 #' @return `data.frame`
 #' @export
-addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE) {
-    x <- .addSubScores(x)
+addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
+                    verbose=interactive()) {
+    x <- .addSubScores(x, verbose=verbose)
     x <- .addSofaScores(
         x,
         lag=lag,
         lagOnlyLaboratory=lagOnlyLaboratory,
-        na.rm=na.rm)
+        na.rm=na.rm,
+        verbose=verbose)
     x
 }
 
@@ -28,9 +31,11 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE) {
 #' @param lagOnlyLaboratory `logical` add lag seconds only to the laboratory
 #' values?
 #' @param na.rm `logical`, should missing values replaced by zero?
+#' @param verbose `logical`, verbose output?
 #' @return `data.frame`
 #' @noRd
-.addSofaScores <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE) {
+.addSofaScores <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
+                           verbose=interactive()) {
     x <- x[order(x$CaseId, x$Date), ]
 
     x$SOFA <- ifelse(na.rm, 0L, NA_integer_)
@@ -42,7 +47,8 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE) {
             .calculateSofa,
             lag=lag,
             lagOnlyLaboratory=lagOnlyLaboratory,
-            na.rm=na.rm)
+            na.rm=na.rm,
+            verbose=verbose)
     )
 
     ## remove useless rownames
@@ -55,9 +61,13 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE) {
 #' Add the subscores to the data.frame.
 #'
 #' @param x `data.frame`
+#' @param verbose `logical`, verbose output?
 #' @return `data.frame`
 #' @noRd
-.addSubScores <- function(x) {
+.addSubScores <- function(x, verbose=interactive()) {
+    if (verbose) {
+        message("Add subscores for BILI, PLT, CREA ...")
+    }
     x[, .sofaItems] <- NA_integer_
 
     ## easy scores
@@ -69,7 +79,13 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE) {
     x$CREA[isCrea] <- .creatinine2sofa(x$Value[isCrea])
 
     ## complicated scores
+    if (verbose) {
+        message("Add subscores for RESP ...")
+    }
     x <- .addRespirationSubScore(x)
+    if (verbose) {
+        message("Add subscores for CIRC ...")
+    }
     x <- .addCirculationSubScore(x)
     x
 }
@@ -179,9 +195,19 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE) {
 #' @param lagOnlyLaboratory `logical` add lag seconds only to the laboratory
 #' values?
 #' @param na.rm `logical`, should missing values replaced by zero?
+#' @param verbose `logical`, verbose output?
 #' @return `data.frame`
 #' @noRd
-.calculateSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE) {
+.calculateSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
+                           verbose=interactive()) {
+    if (verbose) {
+        message(
+            "Calculate SOFA for ", x$CaseId[1L],
+            " (", nrow(x), " timepoints) ..."
+        )
+        pb <- txtProgressBar(min=0L, max=nrow(x), style=3L)
+        on.exit(close(pb))
+    }
     for (i in seq_len(nrow(x))) {
         x$SOFA[i] <- .sofaAt(
             x,
@@ -189,6 +215,9 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE) {
             lag=lag,
             lagOnlyLaboratory=lagOnlyLaboratory,
             na.rm=na.rm)["SOFA"]
+        if (verbose) {
+            setTxtProgressBar(pb, i)
+        }
     }
     x
 }
