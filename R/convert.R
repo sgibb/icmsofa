@@ -53,3 +53,18 @@
       .bincode(x, breaks=c(-Inf, 0:6, Inf))
     ]
 }
+
+#' SpO2 to PaO2
+#'
+#' based on http://www.cscc.imise.uni-leipzig.de/Studien/MEDUSA/CRF-Patient/Konversionstabelle-Oxygenierungsindex.pdf
+#'
+#' @param x double, SpO2
+#' @return double, estimated PaO2
+#' @noRd
+.spo2ToPaO2 <- function(x) {
+    stopifnot(is.numeric(x))
+    c(44, 45, 46, 47, 49, 50, 52, 53, 55, 57, 60, 62, 65, 69, 73, 79, 86, 96,
+        112, 145)[
+        .bincode(x, breaks=c(-Inf, 80:98, Inf))
+    ]
+}

@@ -39,3 +39,12 @@ test_that(".o2FlowRateToFiO2", {
         c(0.24, 0.28, 0.32, 0.36, 0.40, 0.50, 0.60, 0.60, 0.60, 0.60)
     )
 })
+
+test_that(".spo2ToPaO2", {
+    expect_error(icmsofa:::.spo2ToPaO2("A"))
+    expect_equal(
+        icmsofa:::.spo2ToPaO2(79:100),
+        c(44, 44, 45, 46, 47, 49, 50, 52, 53, 55, 57, 60, 62, 65, 69, 73, 79,
+          86, 96, 112, 145, 145)
+    )
+})
