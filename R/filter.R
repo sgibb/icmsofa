@@ -27,10 +27,10 @@
     tbl <- .filterBga(tbl, keep="arterial", verbose=verbose)
 
     flt <- data.frame(
-        type=c("PAO2", "FIO2", "O2INS", "MAP"),
-        value=c("Value", "Value", "Dose", "Value"),
-        lower=c(10, 21, 0, 20),
-        upper=c(600, 100, 15, 150),
+        type=c("PAO2", "FIO2", "O2INS", "SPO2", "MAP"),
+        value=c("Value", "Value", "Dose", "Value", "Value"),
+        lower=c(10, 21, 0, 60, 20),
+        upper=c(600, 100, 15, 100, 150),
         stringsAsFactors=FALSE
     )
 

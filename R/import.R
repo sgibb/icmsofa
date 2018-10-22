@@ -30,6 +30,8 @@ importIcm <- function(file,
     tbl <- tbl[, columns, drop=FALSE]
     colnames(tbl) <- names(columns)
 
+    tbl$Type <- toupper(tbl$Type)
+
     if (verbose) {
         message("Convert dates")
     }
@@ -55,6 +57,9 @@ importIcm <- function(file,
         message("Correct FiO2 times")
     }
     tbl <- .correctFiO2Times(tbl, threshold=3600)
+    tbl <- .convertSpO2intoPaO2(tbl)
+
+    tbl <- tbl[order(tbl$CaseId, tbl$Date),]
     rownames(tbl) <- NULL
     tbl
 }

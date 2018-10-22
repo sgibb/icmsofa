@@ -1,3 +1,23 @@
+#' Convert SpO2 data into PaO2
+#'
+#' @param x `data.frame`
+#' @param threshold `numeric`, threshold time in seconds
+#' @return `data.frame`
+#' @noRd
+.convertSpO2intoPaO2 <- function(x) {
+    isSpO2 <- x$Type == "SPO2" & x$Valid
+    sb <- x[isSpO2,]
+    if (nrow(sb)) {
+        sb$Value <- .spo2ToPaO2(sb$Value)
+        sb$Description <- "estimated PaO2"
+        sb$Type <- "EPAO2"
+        x <- rbind(x, sb)
+        x <- x[order(x$CaseId, x$Date),]
+        rownames(x) <- NULL
+    }
+    x
+}
+
 #' Correct Begin and End Time for FiO2 data
 #'
 #' In contrast to perfusor data or O2 data the BEGIN and END times reflect the
