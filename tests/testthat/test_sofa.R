@@ -43,7 +43,7 @@ test_that(".addRespirationSubScore", {
                           "2014-04-12 10:00:00"), tz="UTC"),
                     Type=c("FIO2", "FIO2", "PAO2", "PAO2", "HORV",
                            "FIO2", "FIO2", "PAO2", "HORV",
-                           "O2INS", "PAO2", "HORV"),
+                           "O2INS", "PAO2", "EHORV"),
                     Value=c(0.5, 0.4, 100, 100, 250, 0.3, 0.3, 80, 80/0.21,
                             0.4, 85, 212.5),
                     RESP=NA_integer_,

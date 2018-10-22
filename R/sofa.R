@@ -101,7 +101,7 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
 #' @noRd
 .addRespirationSubScore <- function(x, threshold=3600) {
     x <- x[order(x$CaseId, x$Date), ]
-    sb <- x[x$Type %in% c("PAO2", "FIO2", "O2INS") & x$Valid,]
+    sb <- x[x$Type %in% c("PAO2", "PAO2", "FIO2", "O2INS") & x$Valid,]
 
     isFiO2 <- sb$Type %in% c("FIO2", "O2INS")
 
@@ -112,7 +112,7 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
         sb[isFiO2, c("Value", "Type", "CaseId", "Begin", "End")]
     sb[, fioCols] <- lapply(sb[, fioCols], .fillNa)
 
-    sb <- sb[sb$Type == "PAO2",]
+    sb <- sb[sb$Type %in% c("EPAO2", "PAO2"),]
     sb[, beCol] <- lapply(
         sb[, beCol],
         as.POSIXct, origin="1970-01-01 00:00:00", tz="UTC"
@@ -133,8 +133,13 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
     sb$FiO2[!isValid] <- 0.21
     sb$Value <- .horovitz(sb$Value, sb$FiO2)
     sb$RESP <- .horovitz2sofa(sb$Value, sb$FiO2Type != "O2INS")
-    sb$Type <- "HORV"
-    sb$Description <- "Horovitz"
+    sb$Type <- ifelse(
+        sb$Type == "EPAO2" | sb$FiO2Type == "O2INS", "EHORV", "HORV"
+    )
+    sb$Description <- ifelse(
+        sb$Type == "EPAO2" | sb$FiO2Type == "O2INS",
+        "estimated Horovitz", "Horovitz"
+    )
     sb <- unique(sb)
 
     x <- rbind(x, sb[, colnames(x), drop=FALSE])
