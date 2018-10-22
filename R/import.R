@@ -46,7 +46,9 @@ importIcm <- function(file,
     tbl$Value[isDrug] <- tbl$Dose[isDrug]
 
     isO2 <- tbl$Type == "O2INS" & tbl$Valid
-    tbl$Value[isO2] <- .o2FlowRateToFiO2(tbl$Dose[isO2])
+    if (any(isO2)) {
+        tbl$Value[isO2] <- .o2FlowRateToFiO2(tbl$Dose[isO2])
+    }
 
     isFiO2 <- tbl$Type == "FIO2" & tbl$Valid
     tbl$Value[isFiO2] <- tbl$Value[isFiO2] / 100L
