@@ -57,7 +57,7 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
             lag=lag,
             lagOnlyLaboratory=lagOnlyLaboratory,
             na.rm=na.rm,
-            estimatedRespirationParams=estimatedRespirationParams,
+            estimatedRespirationParams=match.arg(estimatedRespirationParams),
             verbose=verbose
     )
 
@@ -223,6 +223,7 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
 .calculateSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
     estimatedRespirationParams=c("inferior", "ignore", "keep"),
     verbose=interactive()) {
+    estimatedRespirationParams <- match.arg(estimatedRespirationParams)
     if (verbose) {
         message(
             "Calculate SOFA for ", x$CaseId[1L],
