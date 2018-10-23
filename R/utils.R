@@ -75,7 +75,7 @@
 #' @return `double`
 #' @noRd
 .maxNa <- function(x) {
-    m <- suppressWarnings(max(x, na.rm=TRUE))
+    m <- max(c(-Inf, x), na.rm=TRUE)
     if (is.infinite(m)) {
         NA_integer_
     } else {
@@ -93,11 +93,8 @@
 #' range to 24 h + lag seconds (e.g. laboratory values take some time)
 #' @return `logical`
 #' @noRd
-.prev24h <- function(x, ref, lag=0) {
-    stopifnot(inherits(x, "POSIXct"))
-    stopifnot(inherits(ref, "POSIXct"))
-    stopifnot(is.numeric(lag))
+.prev24h <- function(x, ref, lag=0L) {
     x <- as.numeric(x)
     ref <- as.numeric(ref)
-    x %range% c(ref - 24L * 3600, ref + lag)
+    x %range% c(ref - 24L * 3600L, ref + lag)
 }

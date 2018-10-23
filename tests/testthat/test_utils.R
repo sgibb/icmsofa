@@ -60,8 +60,6 @@ test_that(".prev24h", {
                       "2018-08-12 21:45", "2018-08-12 21:46"),
                     format="%Y-%m-%d %H:%M",
                     origin="1970-01-01 00:00", tz="UTC")
-    expect_error(icmsofa:::.prev24h(1:10, 2))
-    expect_error(icmsofa:::.prev24h(x, 2))
     expect_equal(icmsofa:::.prev24h(x, x[4]),
                  c(TRUE, TRUE, TRUE, TRUE, FALSE, FALSE))
     expect_equal(icmsofa:::.prev24h(x, x[5]),
