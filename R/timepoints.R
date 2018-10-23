@@ -40,6 +40,63 @@ sofaForTimepoints <- function(icm, tp, lag=0L, lagOnlyLaboratory=TRUE) {
     cbind(tp, sofa)
 }
 
+#' Get value for specific timepoint
+#'
+#' @param icm `data.frame`, ICM data
+#' @param tp `data.frme`, timepoint data, first column Id, other columns
+#' timepoints
+#' @param type `character`, type of value
+#' @param lag `numeric`, lag seconds added to reference date and extend the
+#' range to 24 h + lag seconds (e.g. laboratory values take some time)
+#' @param fun `function`, to apply over the values
+#' @param verbose `logical`, verbose output?
+#' @return `data.frame`
+#' @export
+valueForTimepoints <- function(icm, tp, type, lag=0L, fun=.maxNa,
+                               verbose=interactive()) {
+    stopifnot(
+        is.data.frame(icm),
+        is.data.frame(tp) || is.matrix(tp),
+        is.numeric(lag) || length(lag) != 1L,
+        is.character(type) || length(type) != 1L
+    )
+    fun <- match.fun(fun)
+
+    nr <- nrow(tp)
+    nc1 <- ncol(tp) - 1L
+
+    m <- matrix(
+        NA_real_, nrow=nr, ncol=nc1,
+        dimnames=list( c(), paste(type, colnames(tp)[-1L], sep="_"))
+    )
+
+    if (verbose) {
+        message("Looking for ", type, " ...")
+        pb <- txtProgressBar(0L, nr * nc1, style=3L)
+        on.exit(close(pb))
+    }
+    icm <- icm[icm$Type == type, , drop=FALSE]
+
+    for (i in seq_len(nr)) {
+        sb <- icm[icm$CaseId == tp[i, 1L],, drop=FALSE]
+        if (nrow(sb)) {
+            for (j in seq_len(nc1)) {
+                if (verbose) {
+                    setTxtProgressBar(pb, (i - 1L) * nc + j)
+                }
+                m[i, j] <- .valueAt(
+                    sb,
+                    tp=tp[i, j + 1L],
+                    vcol="Value",
+                    lag=lag,
+                    fun=fun
+                )
+            }
+        }
+    }
+    cbind(tp, m)
+}
+
 #' Extract specific time range/frame.
 #'
 #' @param icm `data.frame`, ICM data
