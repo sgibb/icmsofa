@@ -4,7 +4,8 @@
 \alias{sofaForTimepoints}
 \title{Get SOFA for specific timepoint}
 \usage{
-sofaForTimepoints(icm, tp, lag = 0L, lagOnlyLaboratory = TRUE)
+sofaForTimepoints(icm, tp, lag = 0L, lagOnlyLaboratory = TRUE,
+  verbose = interactive())
 }
 \arguments{
 \item{icm}{\code{data.frame}, ICM data}
@@ -17,6 +18,8 @@ range to 24 h + lag seconds (e.g. laboratory values take some time)}
 
 \item{lagOnlyLaboratory}{\code{logical} add lag seconds only to the laboratory
 values?}
+
+\item{verbose}{\code{logical}, verbose output?}
 }
 \value{
 \code{data.frame}
