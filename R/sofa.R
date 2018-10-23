@@ -239,7 +239,7 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
             lag=lag,
             lagOnlyLaboratory=lagOnlyLaboratory,
             na.rm=na.rm,
-            respScoreForEstimatedParams=respScoreForEstimatedParams,
+            estimatedRespirationParams=estimatedRespirationParams
         )["SOFA"]
         if (verbose) {
             setTxtProgressBar(pb, i)
