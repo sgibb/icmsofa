@@ -41,7 +41,7 @@ sofaForTimepoints <- function(icm, tp, lag=0L, lagOnlyLaboratory=TRUE,
         if (nrow(sb)) {
             for (j in seq_len(nc1)) {
                 if (verbose) {
-                    setTxtProgressBar(pb, (i - 1L) * nc + j)
+                    setTxtProgressBar(pb, (i - 1L) * nc1 + j)
                 }
                 sofa[i, (j - 1L) * 6L + 1L:6L] <-
                     .sofaAt(sb,
@@ -97,7 +97,7 @@ valueForTimepoints <- function(icm, tp, type, lag=0L, fun=.maxNa,
         if (nrow(sb)) {
             for (j in seq_len(nc1)) {
                 if (verbose) {
-                    setTxtProgressBar(pb, (i - 1L) * nc + j)
+                    setTxtProgressBar(pb, (i - 1L) * nc1 + j)
                 }
                 m[i, j] <- .valueAt(
                     sb,
