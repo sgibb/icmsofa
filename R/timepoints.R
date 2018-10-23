@@ -15,8 +15,7 @@ sofaForTimepoints <- function(icm, tp, lag=0L, lagOnlyLaboratory=TRUE,
     stopifnot(
         is.data.frame(icm),
         is.data.frame(tp) || is.matrix(tp),
-        is.numeric(lag) || length(lag) != 1L,
-        is.character(type) || length(type) != 1L
+        is.numeric(lag) || length(lag) != 1L
     )
 
     nc1 <- ncol(tp) - 1L
