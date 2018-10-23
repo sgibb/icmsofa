@@ -5,6 +5,7 @@
 \title{Add SOFA scores to \code{data.frame}}
 \usage{
 addSofa(x, lag = 0L, lagOnlyLaboratory = TRUE, na.rm = FALSE,
+  estimatedRespirationParams = c("inferior", "ignore", "keep"),
   verbose = interactive())
 }
 \arguments{
@@ -17,6 +18,9 @@ range to 24 h + lag seconds (e.g. laboratory values take some time)}
 values?}
 
 \item{na.rm}{\code{logical}, should missing values replaced by zero?}
+
+\item{estimatedRespirationParams}{\code{character}, strategy to handle estimated
+respiratory parameters (Horovitz based on EPAO2/O2INS)}
 
 \item{verbose}{\code{logical}, verbose output?}
 }

@@ -6,17 +6,21 @@
 #' @param lagOnlyLaboratory `logical` add lag seconds only to the laboratory
 #' values?
 #' @param na.rm `logical`, should missing values replaced by zero?
+#' @param estimatedRespirationParams `character`, strategy to handle estimated
+#' respiratory parameters (Horovitz based on EPAO2/O2INS)
 #' @param verbose `logical`, verbose output?
 #' @return `data.frame`
 #' @export
 addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
-                    verbose=interactive()) {
+    estimatedRespirationParams=c("inferior", "ignore", "keep"),
+    verbose=interactive()) {
     x <- .addSubScores(x, verbose=verbose)
     x <- .addSofaScores(
         x,
         lag=lag,
         lagOnlyLaboratory=lagOnlyLaboratory,
         na.rm=na.rm,
+        estimatedRespirationParams=estimatedRespirationParams,
         verbose=verbose)
     x
 }
@@ -31,24 +35,30 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
 #' @param lagOnlyLaboratory `logical` add lag seconds only to the laboratory
 #' values?
 #' @param na.rm `logical`, should missing values replaced by zero?
+#' @param estimatedRespirationParams `character`, strategy to handle estimated
+#' respiratory parameters (Horovitz based on EPAO2/O2INS)
 #' @param verbose `logical`, verbose output?
 #' @return `data.frame`
 #' @noRd
 .addSofaScores <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
-                           verbose=interactive()) {
+    estimatedRespirationParams=c("inferior", "ignore", "keep"),
+    verbose=interactive()) {
     x <- x[order(x$CaseId, x$Date), ]
 
-    x$SOFA <- ifelse(na.rm, 0L, NA_integer_)
+    if (na.rm) {
+        x$SOFA <- 0L
+    } else {
+        x$SOFA <- NA_integer_
+    }
 
-    x <- do.call(
-        "rbind",
-        lapply(
+    split(x, x$CaseId) <- lapply(
             split(x, x$CaseId),
             .calculateSofa,
             lag=lag,
             lagOnlyLaboratory=lagOnlyLaboratory,
             na.rm=na.rm,
-            verbose=verbose)
+            estimatedRespirationParams=estimatedRespirationParams,
+            verbose=verbose
     )
 
     ## remove useless rownames
@@ -127,10 +137,12 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
 
     isValid <- sb$Date %inside% sb[, beCol] &
         ((sb$FiO2Type == "FIO2" & sb$FiO2BeginDiff <= threshold) |
-            sb$FiO2Type == "O2INS") & sb$CaseId == sb$FiO2CaseId
+            sb$FiO2Type == "O2INS") & sb$CaseId == sb$FiO2CaseId &
+            sb$Valid & !is.na(sb$FiO2)
 
     ## If FiO2 time doesn't match, use 0.21 as default
     sb$FiO2[!isValid] <- 0.21
+    sb$FiO2Type[!isValid] <- "FiO2"
     sb$Value <- .horovitz(sb$Value, sb$FiO2)
     sb$RESP <- .horovitz2sofa(sb$Value, sb$FiO2Type != "O2INS")
     sb$Type <- ifelse(
@@ -140,7 +152,10 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
         sb$Type == "EPAO2" | sb$FiO2Type == "O2INS",
         "estimated Horovitz", "Horovitz"
     )
-    sb <- unique(sb)
+    sb <- sb[
+        !duplicated(sb[, c("CaseId", "Date", "Type", "Value"), drop=FALSE]),,
+        drop=FALSE
+    ]
 
     x <- rbind(x, sb[, colnames(x), drop=FALSE])
     x <- x[order(x$CaseId, x$Date), ]
@@ -200,11 +215,14 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
 #' @param lagOnlyLaboratory `logical` add lag seconds only to the laboratory
 #' values?
 #' @param na.rm `logical`, should missing values replaced by zero?
+#' @param estimatedRespirationParams `character`, strategy to handle estimated
+#' respiratory parameters (Horovitz based on EPAO2/O2INS)
 #' @param verbose `logical`, verbose output?
 #' @return `data.frame`
 #' @noRd
 .calculateSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
-                           verbose=interactive()) {
+    estimatedRespirationParams=c("inferior", "ignore", "keep"),
+    verbose=interactive()) {
     if (verbose) {
         message(
             "Calculate SOFA for ", x$CaseId[1L],
@@ -219,7 +237,9 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
             x$Date[i],
             lag=lag,
             lagOnlyLaboratory=lagOnlyLaboratory,
-            na.rm=na.rm)["SOFA"]
+            na.rm=na.rm,
+            respScoreForEstimatedParams=respScoreForEstimatedParams,
+        )["SOFA"]
         if (verbose) {
             setTxtProgressBar(pb, i)
         }
@@ -235,42 +255,84 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
 #' range to 24 h + lag seconds (e.g. laboratory values take some time)
 #' @param lagOnlyLaboratory `logical` add lag seconds only to the laboratory
 #' values?
+#' @param estimatedRespirationParams `character`, strategy to handle estimated
+#' respiratory parameters (Horovitz based on EPAO2/O2INS)
 #' @param na.rm `logical`, should missing values replaced by zero?
 #' @return `data.frame`
 #' @noRd
-.sofaAt <- function(x, tp, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE) {
+.sofaAt <- function(x, tp, lag=0L, lagOnlyLaboratory=TRUE,
+                    estimatedRespirationParams=c("inferior", "ignore", "keep"),
+                    na.rm=FALSE) {
+    estimatedRespirationParams <- match.arg(estimatedRespirationParams)
+
     scores <- rep.int(NA_integer_, 6L)
     names(scores) <- c(.sofaItems, "SOFA")
-    items <- .sofaItems
+    lag <- lag * as.integer(
+        .sofaItems %in% c("BILI", "CREA", "PLT") | !lagOnlyLaboratory
+    )
+    names(lag) <- .sofaItems
 
-    if (lagOnlyLaboratory) {
-        sellag <- .prev24h(x$Date, ref=tp, lag=lag)
-        sel <- .prev24h(x$Date, ref=tp)
+    sb <- x[x$Type != "EHORV",, drop=FALSE]
 
-        if (isTRUE(any(sel))) {
-            sb <- x[sellag,, drop=FALSE]
-
-            for (item in c("BILI", "PLT", "CREA")) {
-                scores[item] <- as.integer(.maxNa(sb[, item]))
-            }
-
-            sb <- x[sel,, drop=FALSE]
-
-            for (item in c("RESP", "CIRC")) {
-                scores[item] <- as.integer(.maxNa(sb[, item]))
-            }
-        }
-    } else {
-        sel <- .prev24h(x$Date, ref=tp, lag=lag)
-
-        if (isTRUE(any(sel))) {
-            sb <- x[sel,, drop=FALSE]
-
-            for (item in .sofaItems) {
-                scores[item] <- as.integer(.maxNa(sb[, item]))
-            }
-        }
+    for (item in .sofaItems) {
+        scores[item] <- .valueAt(
+            sb,
+            tp,
+            vcol=item,
+            lag=lag[item],
+            fun=.maxNa
+        )
     }
-    scores["SOFA"] <- sum(scores[.sofaItems])
+
+    scores["RESP"] <- .respScoreForEstimatedParams(
+        x, tp=tp, resp=scores["RESP"],
+        method=estimatedRespirationParams,
+        lag=lag["RESP"]
+    )
+
+    scores["SOFA"] <- sum(scores[.sofaItems], na.rm=na.rm)
     scores
+}
+
+#' Recalculate estimated parameters (Horovitz based on EPAO2 or O2INS)
+#'
+#' @param x `data.frame`
+#' @param tp `POSIXct`, timepoint
+#' @param resp `numeric`, SOFA for RESP
+#' @param method `character`, how to handle estimated parameters
+#' @param lag `numeric`, lag seconds added to reference date and extend the
+#' range to 24 h + lag seconds (e.g. laboratory values take some time)
+#' @noRd
+.respScoreForEstimatedParams <- function(x, tp, resp,
+    method=c("inferior", "ignore", "keep"), lag=0L) {
+
+    method=match.arg(method)
+
+    if (method != "ignore" || (method == "inferior" && is.na(resp))) {
+        score <- .valueAt(
+            x[x$Type == "EHORV",, drop=FALSE],
+            tp,
+            vcol="RESP",
+            lag=lag,
+            fun=.maxNa
+        )
+
+        resp <- .maxNa(c(resp, score))
+    }
+    resp
+}
+
+#' Calculate value over timeperiod
+#'
+#' @param x `data.frame`
+#' @param tp `POSIXct`, timepoint
+#' @param vcol `character`, column that contains the value that should
+#' summarised/calculated.
+#' @param lag `numeric`, lag seconds added to reference date and extend the
+#' range to 24 h + lag seconds (e.g. laboratory values take some time)
+#' @param fun `function`, to apply over the values
+#' @param \ldots further arguments passed to `fun`.
+#' @noRd
+.valueAt <- function(x, tp, vcol="Value", lag=0L, fun=.maxNa, ...) {
+    match.fun(fun)(x[.prev24h(x$Date, ref=tp, lag=lag) & x$Valid, vcol], ...)
 }
