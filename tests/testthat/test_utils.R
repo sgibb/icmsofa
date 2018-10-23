@@ -54,6 +54,13 @@ test_that(".maxNa", {
     expect_equal(icmsofa:::.maxNa(NULL), NA_integer_)
 })
 
+test_that(".minNa", {
+    expect_equal(icmsofa:::.minNa(1:10), 1)
+    expect_equal(icmsofa:::.minNa(c(NA, 1, NA, NA, 2, NA, 1, NA, 3)), 1)
+    expect_equal(icmsofa:::.minNa(c(NA, NA, NA)), NA_integer_)
+    expect_equal(icmsofa:::.minNa(NULL), NA_integer_)
+})
+
 test_that(".prev24h", {
     x <- as.POSIXct(c("2018-08-11 21:40", "2018-08-11 21:44",
                       "2018-08-11 21:45", "2018-08-11 21:46",

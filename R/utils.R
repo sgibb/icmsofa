@@ -77,7 +77,23 @@
 .maxNa <- function(x) {
     m <- max(c(-Inf, x), na.rm=TRUE)
     if (is.infinite(m)) {
-        NA_integer_
+        NA_real_
+    } else {
+        m
+    }
+}
+
+#' Calculate minimum
+#'
+#' Calculate `min` and ignore `NA`, except everything is `NA`
+#'
+#' @param x `double`
+#' @return `double`
+#' @noRd
+.minNa <- function(x) {
+    m <- min(c(Inf, x), na.rm=TRUE)
+    if (is.infinite(m)) {
+        NA_real_
     } else {
         m
     }
