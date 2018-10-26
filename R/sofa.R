@@ -111,7 +111,7 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
 #' @noRd
 .addRespirationSubScore <- function(x, threshold=3600) {
     x <- x[order(x$CaseId, x$Date), ]
-    sb <- x[x$Type %in% c("PAO2", "PAO2", "FIO2", "O2INS") & x$Valid,]
+    sb <- x[x$Type %in% c("EPAO2", "PAO2", "FIO2", "O2INS") & x$Valid,]
 
     isFiO2 <- sb$Type %in% c("FIO2", "O2INS")
 
