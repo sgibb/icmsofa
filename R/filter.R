@@ -29,7 +29,7 @@
     flt <- data.frame(
         type=c("PAO2", "FIO2", "O2INS", "SPO2", "MAP"),
         value=c("Value", "Value", "Dose", "Value", "Value"),
-        lower=c(10, 21, 0, 60, 40),
+        lower=c(10, 21, 0, 70, 40),
         upper=c(600, 100, 15, 100, 150),
         stringsAsFactors=FALSE
     )
