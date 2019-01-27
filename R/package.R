@@ -7,6 +7,6 @@
 #' @importFrom grDevices dev.off png
 #' @importFrom graphics abline axis layout legend mtext par plot points text
 #'  title
-#' @importFrom utils read.table write.csv
+#' @importFrom utils read.table write.csv setTxtProgressBar txtProgressBar
 #'
 "_PACKAGE"
