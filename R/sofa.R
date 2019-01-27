@@ -307,9 +307,9 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
 .respScoreForEstimatedParams <- function(x, tp, resp,
     method=c("inferior", "ignore", "keep"), lag=0L) {
 
-    method=match.arg(method)
+    method <- match.arg(method)
 
-    if (method != "ignore" || (method == "inferior" && is.na(resp))) {
+    if (method == "keep" || (method == "inferior" && is.na(resp))) {
         score <- .valueAt(
             x[x$Type == "EHORV",, drop=FALSE],
             tp,
