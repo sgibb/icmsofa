@@ -233,13 +233,15 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
         on.exit(close(pb))
     }
     for (i in seq_len(nrow(x))) {
+        x <- setEstimatedRespirationParams(
+            x, x$Date[i], lag=lag, method=estimatedRespirationParams
+        )
         x$SOFA[i] <- .sofaAt(
             x,
             x$Date[i],
             lag=lag,
             lagOnlyLaboratory=lagOnlyLaboratory,
-            na.rm=na.rm,
-            estimatedRespirationParams=estimatedRespirationParams
+            na.rm=na.rm
         )["SOFA"]
         if (verbose) {
             setTxtProgressBar(pb, i)
@@ -256,16 +258,10 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
 #' range to 24 h + lag seconds (e.g. laboratory values take some time)
 #' @param lagOnlyLaboratory `logical` add lag seconds only to the laboratory
 #' values?
-#' @param estimatedRespirationParams `character`, strategy to handle estimated
-#' respiratory parameters (Horovitz based on EPAO2/O2INS)
 #' @param na.rm `logical`, should missing values replaced by zero?
 #' @return `data.frame`
 #' @noRd
-.sofaAt <- function(x, tp, lag=0L, lagOnlyLaboratory=TRUE,
-                    estimatedRespirationParams=c("inferior", "ignore", "keep"),
-                    na.rm=FALSE) {
-    estimatedRespirationParams <- match.arg(estimatedRespirationParams)
-
+.sofaAt <- function(x, tp, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE) {
     scores <- rep.int(NA_integer_, 6L)
     names(scores) <- c(.sofaItems, "SOFA")
     lag <- lag * as.integer(
@@ -273,11 +269,9 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
     )
     names(lag) <- .sofaItems
 
-    sb <- x[x$Type != "EHORV",, drop=FALSE]
-
     for (item in .sofaItems) {
         scores[item] <- .valueAt(
-            sb,
+            x,
             tp,
             vcol=item,
             lag=lag[item],
@@ -285,42 +279,8 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
         )
     }
 
-    scores["RESP"] <- .respScoreForEstimatedParams(
-        x, tp=tp, resp=scores["RESP"],
-        method=estimatedRespirationParams,
-        lag=lag["RESP"]
-    )
-
     scores["SOFA"] <- sum(scores[.sofaItems], na.rm=na.rm)
     scores
-}
-
-#' Recalculate estimated parameters (Horovitz based on EPAO2 or O2INS)
-#'
-#' @param x `data.frame`
-#' @param tp `POSIXct`, timepoint
-#' @param resp `numeric`, SOFA for RESP
-#' @param method `character`, how to handle estimated parameters
-#' @param lag `numeric`, lag seconds added to reference date and extend the
-#' range to 24 h + lag seconds (e.g. laboratory values take some time)
-#' @noRd
-.respScoreForEstimatedParams <- function(x, tp, resp,
-    method=c("inferior", "ignore", "keep"), lag=0L) {
-
-    method <- match.arg(method)
-
-    if (method == "keep" || (method == "inferior" && is.na(resp))) {
-        score <- .valueAt(
-            x[x$Type == "EHORV",, drop=FALSE],
-            tp,
-            vcol="RESP",
-            lag=lag,
-            fun=.maxNa
-        )
-
-        resp <- .maxNa(c(resp, score))
-    }
-    resp
 }
 
 #' Calculate value over timeperiod
@@ -336,4 +296,28 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
 #' @noRd
 .valueAt <- function(x, tp, vcol="Value", lag=0L, fun=.maxNa, ...) {
     match.fun(fun)(x[.prev24h(x$Date, ref=tp, lag=lag) & x$Valid, vcol], ...)
+}
+
+#' Set validity for estimated respiratory parameters
+#'
+#' @param x `data.frame`
+#' @param tp `POSIXct`, timepoint
+#' @param lag `numeric`, lag seconds added to reference date and extend the
+#' range to 24 h + lag seconds (e.g. laboratory values take some time)
+#' @param method `character`, how to handle estimated parameters
+#' @noRd
+setEstimatedRespirationParams <- function(x, tp,
+    method=c("inferior", "ignore", "keep"), lag=0L) {
+
+    method <- match.arg(method)
+
+    if (method == "ignore") {
+        x$Valid[x$Type == "EHORV"] <- FALSE
+    } else if (method == "inferior") {
+        sel <- .prev24h(x$Date, ref=tp, lag=lag) & x$Valid
+        if (isTRUE(any(x$Type[sel] == "HORV"))) {
+            x$Valid[sel & x$Type == "EHORV"] <- FALSE
+        }
+    }
+    x
 }

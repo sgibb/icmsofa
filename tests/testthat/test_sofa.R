@@ -98,35 +98,6 @@ test_that(".addCirculationSubScore", {
     expect_equal(icmsofa:::.addCirculationSubScore(d), r)
 })
 
-test_that(".respScoreForEstimatedParams", {
-    d <- data.frame(CaseId=1,
-                    Date=as.POSIXct(
-                        c("2014-02-26 05:00:00",
-                          "2014-02-26 07:00:00",
-                          "2014-02-26 07:00:00",
-                          "2014-02-26 07:55:00",
-                          "2014-02-26 08:00:00"), tz="UTC"),
-                    Type=c("EHORV", "HORV", "HORV", "EHORV", "HORV"),
-                    Value=c(210, 199, 150, 80, 100),
-                    RESP=c(2, 3, 3, 4, 1),
-                    Valid=TRUE,
-                    stringsAsFactors=FALSE)
-    expect_equal(icmsofa:::.respScoreForEstimatedParams(d, d$Date[2],
-        resp=NA, method="inferior"), 2)
-    expect_equal(icmsofa:::.respScoreForEstimatedParams(d, d$Date[2],
-        resp=3, method="inferior"), 3)
-    expect_equal(icmsofa:::.respScoreForEstimatedParams(d, d$Date[5],
-        resp=NA, method="keep"), 4)
-    expect_equal(icmsofa:::.respScoreForEstimatedParams(d, d$Date[5],
-        resp=3, method="keep"), 4)
-    expect_equal(icmsofa:::.respScoreForEstimatedParams(d, d$Date[3],
-        resp=3, method="keep"), 3)
-    expect_equal(icmsofa:::.respScoreForEstimatedParams(d, d$Date[5],
-        resp=NA, method="ignore"), NA)
-    expect_equal(icmsofa:::.respScoreForEstimatedParams(d, d$Date[5],
-        resp=3, method="ignore"), 3)
-})
-
 test_that(".valueAt", {
     d <- data.frame(CaseId=1,
                     Date=as.POSIXct(
