@@ -4,8 +4,8 @@
 \alias{valueForTimepoints}
 \title{Get value for specific timepoint}
 \usage{
-valueForTimepoints(icm, tp, type, lag = 0L, fun = .maxNa,
-  verbose = interactive())
+valueForTimepoints(icm, tp, type, lag = 0L, prelag = 0L,
+  fun = .maxNa, verbose = interactive())
 }
 \arguments{
 \item{icm}{\code{data.frame}, ICM data}
@@ -17,6 +17,9 @@ timepoints}
 
 \item{lag}{\code{numeric}, lag seconds added to reference date and extend the
 range to 24 h + lag seconds (e.g. laboratory values take some time)}
+
+\item{prelag}{\code{numeric}, lag seconds added to reference date-24h and extend the
+range to -24 h + lag seconds}
 
 \item{fun}{\code{function}, to apply over the values}
 
