@@ -275,6 +275,7 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
             tp,
             vcol=item,
             lag=lag[item],
+            prelag=0L,
             fun=.maxNa
         )
     }
@@ -291,11 +292,13 @@ addSofa <- function(x, lag=0L, lagOnlyLaboratory=TRUE, na.rm=FALSE,
 #' summarised/calculated.
 #' @param lag `numeric`, lag seconds added to reference date and extend the
 #' range to 24 h + lag seconds (e.g. laboratory values take some time)
+#' @param prelag `numeric`, lag seconds added to reference date-24h and extend the
+#' range to -24 h + lag seconds
 #' @param fun `function`, to apply over the values
 #' @param \ldots further arguments passed to `fun`.
 #' @noRd
-.valueAt <- function(x, tp, vcol="Value", lag=0L, fun=.maxNa, ...) {
-    match.fun(fun)(x[.prev24h(x$Date, ref=tp, lag=lag) & x$Valid, vcol], ...)
+.valueAt <- function(x, tp, vcol="Value", lag=0L, prelag=0L, fun=.maxNa, ...) {
+    match.fun(fun)(x[.prev24h(x$Date, ref=tp, lag=lag, prelag=prelag) & x$Valid, vcol], ...)
 }
 
 #' Set validity for estimated respiratory parameters
@@ -314,7 +317,7 @@ setEstimatedRespirationParams <- function(x, tp,
     if (method == "ignore") {
         x$Valid[x$Type == "EHORV"] <- FALSE
     } else if (method == "inferior") {
-        sel <- .prev24h(x$Date, ref=tp, lag=lag) & x$Valid
+        sel <- .prev24h(x$Date, ref=tp, lag=lag, prelag=0L) & x$Valid
         if (isTRUE(any(x$Type[sel] == "HORV"))) {
             x$Valid[sel & x$Type == "EHORV"] <- FALSE
         }

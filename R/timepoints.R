@@ -63,11 +63,13 @@ sofaForTimepoints <- function(icm, tp, lag=0L, lagOnlyLaboratory=TRUE,
 #' @param type `character`, type of value
 #' @param lag `numeric`, lag seconds added to reference date and extend the
 #' range to 24 h + lag seconds (e.g. laboratory values take some time)
+#' @param prelag `numeric`, lag seconds added to reference date-24h and extend the
+#' range to -24 h + lag seconds
 #' @param fun `function`, to apply over the values
 #' @param verbose `logical`, verbose output?
 #' @return `data.frame`
 #' @export
-valueForTimepoints <- function(icm, tp, type, lag=0L, fun=.maxNa,
+valueForTimepoints <- function(icm, tp, type, lag=0L, prelag=0L, fun=.maxNa,
                                verbose=interactive()) {
     stopifnot(
         is.data.frame(icm),
@@ -104,6 +106,7 @@ valueForTimepoints <- function(icm, tp, type, lag=0L, fun=.maxNa,
                     tp=tp[i, j + 1L],
                     vcol="Value",
                     lag=lag,
+                    prelag=prelag,
                     fun=fun
                 )
             }

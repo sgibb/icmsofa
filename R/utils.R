@@ -107,10 +107,12 @@
 #' @param ref `POSIXct`, reference date
 #' @param lag `numeric`, lag seconds added to reference date and extend the
 #' range to 24 h + lag seconds (e.g. laboratory values take some time)
+#' @param prelag `numeric`, lag seconds added to reference date-24h and extend the
+#' range to -24 h + lag seconds
 #' @return `logical`
 #' @noRd
-.prev24h <- function(x, ref, lag=0L) {
+.prev24h <- function(x, ref, lag=0L, prelag=0L) {
     x <- as.numeric(x)
     ref <- as.numeric(ref)
-    x %range% c(ref - 24L * 3600L, ref + lag)
+    x %range% c(ref - 24L * 3600L + prelag, ref + lag)
 }

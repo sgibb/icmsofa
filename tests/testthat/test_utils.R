@@ -75,4 +75,8 @@ test_that(".prev24h", {
                  c(FALSE, FALSE, FALSE, TRUE, TRUE, TRUE))
     expect_equal(icmsofa:::.prev24h(x, x[3], 60),
                  c(TRUE, TRUE, TRUE, TRUE, FALSE, FALSE))
+    expect_equal(icmsofa:::.prev24h(x, x[5], 0, -60),
+                 c(FALSE, TRUE, TRUE, TRUE, TRUE, FALSE))
+    expect_equal(icmsofa:::.prev24h(x, x[5], 0, 60),
+                 c(FALSE, FALSE, FALSE, TRUE, TRUE, FALSE))
 })
